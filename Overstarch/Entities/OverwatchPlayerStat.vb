@@ -3,7 +3,13 @@
     ''' <summary>
     ''' 
     ''' </summary>
-    Public NotInheritable Class OverwatchAchievement
+    Public NotInheritable Class OverwatchPlayerStat
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property Hero As String
 
         ''' <summary>
         ''' 
@@ -21,20 +27,7 @@
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property IconUrl As String
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <returns></returns>
-        Public ReadOnly Property IsEarned As Boolean
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        Friend Sub New()
-            Throw New NotImplementedException
-        End Sub
+        Public ReadOnly Property Value As ULong
 
     End Class
 End Namespace

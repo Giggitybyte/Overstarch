@@ -3,7 +3,7 @@
     ''' <summary>
     ''' 
     ''' </summary>
-    Friend Class OverwatchWebClient
+    Friend NotInheritable Class OverwatchWebClient
 
     End Class
 End Namespace

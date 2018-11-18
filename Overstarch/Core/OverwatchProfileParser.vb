@@ -3,7 +3,7 @@
     ''' <summary>
     ''' 
     ''' </summary>
-    Friend Class OverwatchProfileParser
+    Friend NotInheritable Class OverwatchProfileParser
 
     End Class
 End Namespace

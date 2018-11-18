@@ -2,7 +2,7 @@
     ''' <summary>
     ''' 
     ''' </summary>
-    Public Enum OverwatchEndorsementType
+    Public Enum OverwatchEndorsement
 
         ''' <summary>
         ''' 
