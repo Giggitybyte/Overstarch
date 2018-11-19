@@ -8,19 +8,20 @@ Namespace Entities
     Public NotInheritable Class OverwatchPlayer
 
         ''' <summary>
-        ''' 
+        ''' The username for this player.
         ''' </summary>
-        ''' <returns></returns>
+        ''' <returns>A <see cref="String"/> containing a username.</returns>
         Public ReadOnly Property Username As String
 
         ''' <summary>
-        ''' 
+        ''' The numeric identifier for this player's Battletag.
+        ''' <para>This value will be 0 for console players.</para>
         ''' </summary>
-        ''' <returns></returns>
-        Public ReadOnly Property Discriminator As UShort
+        ''' <returns>A <see cref="UShort"/> containing </returns>
+        Public ReadOnly Property BattleTagCode As UShort
 
         ''' <summary>
-        ''' 
+        ''' The player ID internally used by Blizzard.
         ''' </summary>
         ''' <returns></returns>
         Public ReadOnly Property BlizzardId As String

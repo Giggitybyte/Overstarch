@@ -5,6 +5,7 @@ Imports AngleSharp.Dom
 Imports Newtonsoft.Json
 Imports Overstarch.Entities
 Imports Overstarch.Enums
+
 ''' <summary>
 ''' 
 ''' </summary>
@@ -24,7 +25,9 @@ Public NotInheritable Class OverwatchClient
     Public Async Function GetPlayerAsync(username As String, Optional platform As OverwatchPlatform = 0) As Task(Of OverwatchPlayer)
         Dim player As OverwatchPlayer
 
-        If platform <> 0 Then
+        If platform = 0 Then
+            player = Await PlatformLookupAsync(username)
+        Else
             If platform = OverwatchPlatform.PC AndAlso Not _battletagRegex.IsMatch(username) Then Throw New ArgumentException("Provided battletag was not valid.")
             If platform = OverwatchPlatform.PSN AndAlso Not _psnIdRegex.IsMatch(username) Then Throw New ArgumentException("Provided PSN ID was not valid.")
             If platform = OverwatchPlatform.XBL AndAlso Not _xblIdRegex.IsMatch(username) Then Throw New ArgumentException("Provided gamertag was not valid.")
@@ -32,9 +35,14 @@ Public NotInheritable Class OverwatchClient
             Dim profile As IDocument = Await _webpageRetriever.OpenAsync($"{BaseUrl}/career/{platform.ToString.ToLower}/{username}")
             player = New OverwatchPlayer
 
-            ' Parsing stuff here
-        Else
-            player = Await PlatformLookupAsync(username)
+            If profile.TextContent.Contains("Profile Not Found") Then
+                Throw New ArgumentException("Provided username does not exist.")
+            Else
+                With player
+                    ' Parsing stuff here.
+                End With
+            End If
+
         End If
 
         Return player
@@ -46,7 +54,7 @@ Public NotInheritable Class OverwatchClient
     ''' <param name="username"></param>
     ''' <returns></returns>
     Private Async Function PlatformLookupAsync(username As String) As Task(Of OverwatchPlayer)
-        Dim lookupUrl As String = $"{BaseUrl}/search/account-by-name/{Uri.EscapeDataString(username)}"
+        Dim lookupUrl As String = $"{BaseUrl}/search/account-by-name/{Uri.EscapeUriString(username)}"
         Dim lookupResults As New List(Of OverwatchSearchResult)
 
         Using webpage As New WebClient
