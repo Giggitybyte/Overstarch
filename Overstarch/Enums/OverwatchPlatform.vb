@@ -1,9 +1,12 @@
-﻿Namespace Enums
+﻿Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Converters
+
+Namespace Enums
 
     ''' <summary>
     ''' 
     ''' </summary>
-    <Flags>
+    <Flags, JsonConverter(GetType(StringEnumConverter))>
     Public Enum OverwatchPlatform
 
         ''' <summary>
