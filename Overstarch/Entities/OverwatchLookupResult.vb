@@ -6,7 +6,7 @@ Namespace Entities
     ''' <summary>
     ''' 
     ''' </summary>
-    Friend Class OverwatchAccountResult
+    Friend Class OverwatchLookupResult
 
         ''' <summary>
         ''' 

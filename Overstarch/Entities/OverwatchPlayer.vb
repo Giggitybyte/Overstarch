@@ -8,7 +8,7 @@ Namespace Entities
     Public NotInheritable Class OverwatchPlayer
 
         ''' <summary>
-        ''' The username for this player.
+        ''' The username for this player profile.
         ''' </summary>
         ''' <returns>A <see cref="String"/> containing a username.</returns>
         Public Property Username As String
@@ -20,7 +20,13 @@ Namespace Entities
         Public Property Id As String
 
         ''' <summary>
-        ''' 
+        ''' Whether or not this player has profiles on other platforms.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property HasAliases As Boolean
+
+        ''' <summary>
+        ''' The platform for this Overwatch player profile.
         ''' </summary>
         ''' <returns></returns>
         Public Property Platform As OverwatchPlatform
@@ -77,12 +83,12 @@ Namespace Entities
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public Property Stats As Dictionary(Of OverwatchGamemode, List(Of OverwatchPlayerStat))
+        Public Property Achievements As List(Of OverwatchAchievement)
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public Property Achievements As List(Of OverwatchAchievement)
+        Public Property Stats As Dictionary(Of OverwatchGamemode, List(Of OverwatchPlayerStat))
     End Class
 End Namespace

@@ -1,4 +1,6 @@
-﻿Namespace Entities
+﻿Imports Overstarch.Enums
+
+Namespace Entities
 
     ''' <summary>
     ''' 
@@ -9,32 +11,30 @@
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property Category As String
+        Public Property Category As OverwatchAchievementCategory
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property Name As String
+        Public Property Name As String
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property IconUrl As String
+        Public Property Description As String
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property IsEarned As Boolean
+        Public Property IconUrl As String
 
         ''' <summary>
         ''' 
         ''' </summary>
-        Friend Sub New()
-            Throw New NotImplementedException
-        End Sub
-
+        ''' <returns></returns>
+        Public Property HasAchieved As Boolean
     End Class
 End Namespace

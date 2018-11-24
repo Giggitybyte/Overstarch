@@ -1,20 +1,14 @@
-Imports System.Net
 Imports System.Text.RegularExpressions
-Imports AngleSharp
-Imports AngleSharp.Dom
-Imports AngleSharp.Dom.Html
 Imports Newtonsoft.Json
 Imports Overstarch.Entities
 Imports Overstarch.Enums
+Imports Overstarch.Internal
 
 ''' <summary>
 ''' Library entry point and main interface.
-''' <para>All Overwatch player data is fetched and parsed within this class.</para>
 ''' </summary>
 Public NotInheritable Class OverwatchClient
-    Private Const BaseUrl As String = "https://playoverwatch.com/en-us"
-    Private ReadOnly _webpageParser As BrowsingContext = BrowsingContext.[New](Configuration.Default.WithDefaultLoader)
-    Private ReadOnly _playerIdRegex As Regex = New Regex("\d+")
+    Private ReadOnly _profileParser As New OverwatchProfileParser
     Private ReadOnly _battletagRegex As Regex = New Regex("\w+#\d+")
     Private ReadOnly _psnIdRegex As Regex = New Regex("^[a-zA-Z]{1}[\w\d-]{2,12}$")
     Private ReadOnly _xblIdRegex As Regex = New Regex("^[a-zA-Z0-9\s]{1,15}$")
@@ -40,36 +34,7 @@ Public NotInheritable Class OverwatchClient
                 Throw New ArgumentException("Provided gamertag was not valid.")
             End If
 
-            ' Scrape data from profile.
-            Dim profileWebpage As IDocument = Await _webpageParser.OpenAsync($"{BaseUrl}/career/{platform.ToString.ToLower}/{username.Replace("#"c, "-"c)}")
-            player = New OverwatchPlayer
-
-            If profileWebpage.QuerySelector("h1.u-align-center")?.FirstChild.TextContent = "Profile Not Found" Then
-                Throw New ArgumentException("Provided username does not exist on this platform.")
-            Else
-                With player
-                    .CompetitiveSkillRating = If(UShort.TryParse(profileWebpage.QuerySelector("div.competitive-rank div")?.TextContent, .CompetitiveSkillRating), .CompetitiveSkillRating, 0)
-                    .CompetitiveRankImageUrl = If(TryCast(profileWebpage.QuerySelector("div.competitive-rank img"), IHtmlImageElement)?.Source, String.Empty)
-                    .EndorsementLevel = If(UShort.TryParse(profileWebpage.QuerySelector("div.endorsement-level div.u-center")?.TextContent, .EndorsementLevel), .EndorsementLevel, 0)
-                    .Endorsements = ParseEndorsements(profileWebpage.QuerySelector("div.endorsement-level"))
-                    .Id = _playerIdRegex.Match(profileWebpage.QuerySelectorAll("script").Last.TextContent).Value
-                    .IsProfilePrivate = profileWebpage.QuerySelector(".masthead-permission-level-text")?.TextContent = "Private Profile"
-                    .Platform = platform
-
-                    Dim levelImageAttribute As String = profileWebpage.QuerySelector("div.player-level").GetAttribute("style")
-                    Dim startIndex As Integer = levelImageAttribute.IndexOf("("c) + 1
-                    .PlayerLevelImageUrl = levelImageAttribute.Substring(startIndex, levelImageAttribute.IndexOf(")"c) - startIndex)
-
-                    ' Fetch remaining data from non-public API.
-                    Dim platformsUrl As String = $"{BaseUrl}/career/platforms/{ .Id}"
-                    Dim accounts As List(Of OverwatchAccountResult) = JsonConvert.DeserializeObject(Of List(Of OverwatchAccountResult))(FetchJson(platformsUrl))
-                    Dim currentAccount As OverwatchAccountResult = accounts.Where(Function(p) p.Platform = player.Platform).FirstOrDefault
-
-                    .PlayerIconUrl = $"https://d1u1mce87gyfbn.cloudfront.net/game/unlocks/{currentAccount.PlayerIcon}.png"
-                    .PlayerLevel = currentAccount.Level
-                    .Username = currentAccount.Username
-                End With
-            End If
+            player = Await _profileParser.ParseAsync(username, platform)
         End If
 
         Return player
@@ -92,14 +57,14 @@ Public NotInheritable Class OverwatchClient
     ''' <param name="username">The username or battletag to lookup.</param>
     ''' <returns>An <see cref="OverwatchPlayer"/> object.</returns>
     Private Async Function PlatformLookupAsync(username As String) As Task(Of OverwatchPlayer)
-        Dim lookupUrl As String = $"{BaseUrl}/search/account-by-name/{Uri.EscapeUriString(username)}"
-        Dim lookupResults As List(Of OverwatchAccountResult) = JsonConvert.DeserializeObject(Of List(Of OverwatchAccountResult))(FetchJson(lookupUrl))
+        Dim lookupUrl As String = $"{OverstarchUtilities.BaseUrl}/search/account-by-name/{Uri.EscapeUriString(username)}"
+        Dim lookupResults As List(Of OverwatchLookupResult) = JsonConvert.DeserializeObject(Of List(Of OverwatchLookupResult))(OverstarchUtilities.FetchJson(lookupUrl))
 
         If lookupResults.Count = 0 Then
             Throw New ArgumentException("There are no Overwatch players with that username.")
         Else
             If _battletagRegex.IsMatch(username) Then
-                Dim matchedPlayer As OverwatchAccountResult = lookupResults.Where(Function(r) r.Username.ToLower = username.ToLower).FirstOrDefault
+                Dim matchedPlayer As OverwatchLookupResult = lookupResults.Where(Function(r) r.Username.ToLower = username.ToLower).FirstOrDefault
 
                 If matchedPlayer IsNot Nothing Then
                     Return Await GetPlayerAsync(matchedPlayer.Username, matchedPlayer.Platform)
@@ -107,54 +72,9 @@ Public NotInheritable Class OverwatchClient
                     Throw New ArgumentException("Provided battletag does not exist.")
                 End If
             Else
-                Dim result As OverwatchAccountResult = lookupResults.First
+                Dim result As OverwatchLookupResult = lookupResults.First
                 Return Await GetPlayerAsync(result.Username, result.Platform)
             End If
         End If
-    End Function
-
-    ''' <summary>
-    ''' Internal method: parses HTML content related to endorsement percentages.
-    ''' </summary>
-    ''' <param name="endorsementContent">Endorsement HTML content.</param>
-    ''' <returns>A dictionary of <see cref="OverwatchEndorsement"/> and <see cref="Decimal"/>.</returns>
-    Private Function ParseEndorsements(endorsementContent As IElement) As Dictionary(Of OverwatchEndorsement, Decimal)
-        Dim endorsements As New Dictionary(Of OverwatchEndorsement, Decimal)
-
-        If endorsementContent IsNot Nothing Then
-            For Each endorsement As IElement In endorsementContent.QuerySelectorAll("svg")
-                Dim percentage As String = endorsement.GetAttribute("data-value")
-
-                If percentage IsNot Nothing Then
-                    Dim endorsementName As String = endorsement.GetAttribute("class").Substring(endorsement.GetAttribute("class").IndexOf("--") + 2)
-                    Dim endorsementEnum As OverwatchEndorsement
-
-                    Select Case endorsementName
-                        Case "teammate"
-                            endorsementEnum = OverwatchEndorsement.GOODTEAMMATE
-                        Case "shotcaller"
-                            endorsementEnum = OverwatchEndorsement.SHOTCALLER
-                        Case "sportsmanship"
-                            endorsementEnum = OverwatchEndorsement.SPORTSMANSHIP
-                    End Select
-
-                    endorsements.Add(endorsementEnum, Decimal.Parse(percentage))
-                End If
-            Next
-        End If
-
-        Return endorsements
-    End Function
-
-    ''' <summary>
-    ''' Internal method: simply retrieves the source of a webpage. Intended to download JSON for deserialization.
-    ''' </summary>
-    ''' <param name="url">JSON URL.</param>
-    ''' <returns>A <see cref="String"/> containing JSON.</returns>
-    Private Function FetchJson(url As String) As String
-        Using webpage As New WebClient
-            webpage.Headers(HttpRequestHeader.UserAgent) = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36"
-            Return webpage.DownloadString(url)
-        End Using
     End Function
 End Class
