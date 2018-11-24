@@ -11,86 +11,78 @@ Namespace Entities
         ''' The username for this player.
         ''' </summary>
         ''' <returns>A <see cref="String"/> containing a username.</returns>
-        Public ReadOnly Property Username As String
+        Public Property Username As String
 
         ''' <summary>
-        ''' The numeric identifier for this player's Battletag.
-        ''' <para>This value will be 0 for console players.</para>
-        ''' </summary>
-        ''' <returns>A <see cref="UShort"/> containing </returns>
-        Public ReadOnly Property BattleTagCode As UShort
-
-        ''' <summary>
-        ''' The player ID internally used by Blizzard.
+        ''' Internal Blizzard player ID.
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property BlizzardId As String
+        Public Property Id As String
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property Platform As OverwatchPlatform
+        Public Property Platform As OverwatchPlatform
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property IsProfilePrivate As Boolean
+        Public Property IsProfilePrivate As Boolean
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property PlayerIconUrl As String
+        Public Property PlayerIconUrl As String
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property PlayerLevel As UShort
+        Public Property PlayerLevel As UShort
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property PlayerLevelImageUrl As String
+        Public Property PlayerLevelImageUrl As String
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property CompetitiveRank As UShort
+        Public Property CompetitiveSkillRating As UShort
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property CompetitiveRankImageUrl As String
+        Public Property CompetitiveRankImageUrl As String
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property EndorsementLevel As UShort
+        Public Property EndorsementLevel As UShort
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property Endorsements As Dictionary(Of OverwatchEndorsement, Decimal)
+        Public Property Endorsements As Dictionary(Of OverwatchEndorsement, Decimal)
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property Stats As Dictionary(Of OverwatchGamemode, List(Of OverwatchPlayerStat))
+        Public Property Stats As Dictionary(Of OverwatchGamemode, List(Of OverwatchPlayerStat))
 
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property AssociatedAccounts As List(Of OverwatchPlayer)
-
+        Public Property Achievements As List(Of OverwatchAchievement)
     End Class
 End Namespace
