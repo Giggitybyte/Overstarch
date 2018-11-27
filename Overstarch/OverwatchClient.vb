@@ -41,16 +41,6 @@ Public NotInheritable Class OverwatchClient
     End Function
 
     ''' <summary>
-    ''' Fetches any associated accounts on other platforms for a given player.
-    ''' <para>All data and stats will be retrieved for each associated account. As a result, it may take a moment for this method to return.</para>
-    ''' </summary>
-    ''' <param name="player">An <see cref="OverwatchPlayer"/> retrieved from <see cref="GetPlayerAsync(String, OverwatchPlatform)"/>.</param>
-    ''' <returns>A list of <see cref="OverwatchPlayer"/> objects.</returns>
-    Public Function GetAssociatedAccounts(player As OverwatchPlayer) As List(Of OverwatchPlayer)
-        Throw New NotImplementedException
-    End Function
-
-    ''' <summary>
     ''' Internal method: performs a lookup of Overwatch players from a username.
     ''' <para>Auto-detects battletags that are passed in and searches lookup results for an exact match and returns it. Non-battletag lookups will simply return the first player from the lookup results.</para>
     ''' </summary>
@@ -58,13 +48,13 @@ Public NotInheritable Class OverwatchClient
     ''' <returns>An <see cref="OverwatchPlayer"/> object.</returns>
     Private Async Function PlatformLookupAsync(username As String) As Task(Of OverwatchPlayer)
         Dim lookupUrl As String = $"{OverstarchUtilities.BaseUrl}/search/account-by-name/{Uri.EscapeUriString(username)}"
-        Dim lookupResults As List(Of OverwatchLookupResult) = JsonConvert.DeserializeObject(Of List(Of OverwatchLookupResult))(OverstarchUtilities.FetchJson(lookupUrl))
+        Dim lookupResults As List(Of OverwatchApiPlayer) = JsonConvert.DeserializeObject(Of List(Of OverwatchApiPlayer))(OverstarchUtilities.FetchJson(lookupUrl))
 
         If lookupResults.Count = 0 Then
             Throw New ArgumentException("There are no Overwatch players with that username.")
         Else
             If _battletagRegex.IsMatch(username) Then
-                Dim matchedPlayer As OverwatchLookupResult = lookupResults.Where(Function(r) r.Username.ToLower = username.ToLower).FirstOrDefault
+                Dim matchedPlayer As OverwatchApiPlayer = lookupResults.Where(Function(r) r.Username.ToLower = username.ToLower).FirstOrDefault
 
                 If matchedPlayer IsNot Nothing Then
                     Return Await GetPlayerAsync(matchedPlayer.Username, matchedPlayer.Platform)
@@ -72,7 +62,7 @@ Public NotInheritable Class OverwatchClient
                     Throw New ArgumentException("Provided battletag does not exist.")
                 End If
             Else
-                Dim result As OverwatchLookupResult = lookupResults.First
+                Dim result As OverwatchApiPlayer = lookupResults.First
                 Return Await GetPlayerAsync(result.Username, result.Platform)
             End If
         End If

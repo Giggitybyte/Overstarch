@@ -1,7 +1,11 @@
 ﻿Imports System.Net
 
 Namespace Internal
-    Friend Class OverstarchUtilities
+
+    ''' <summary>
+    ''' Internal class containing utilites.
+    ''' </summary>
+    Friend NotInheritable Class OverstarchUtilities
         Friend Shared ReadOnly BaseUrl As String = "https://playoverwatch.com/en-us"
 
         ''' <summary>
