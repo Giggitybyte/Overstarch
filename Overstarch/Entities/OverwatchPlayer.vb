@@ -38,6 +38,12 @@ Namespace Entities
         Public Property IsProfilePrivate As Boolean
 
         ''' <summary>
+        ''' The profile URL for this player.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ProfileUrl As String
+
+        ''' <summary>
         ''' The icon for this player profile.
         ''' </summary>
         ''' <returns>A <see cref="String"/></returns>

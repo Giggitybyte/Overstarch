@@ -3,14 +3,14 @@ Imports Overstarch.Entities
 Imports Overstarch.Enums
 
 Namespace Extensions
-    Module EnumerableExtensions
+    Public Module EnumerableExtensions
 
         ''' <summary>
         ''' Get stats for a specific hero.
         ''' </summary>
         ''' <returns>A collection of filtered stats.</returns>
         <Extension()>
-        Function FilterByHero(stats As IEnumerable(Of OverwatchStat), heroName As String) As IEnumerable(Of OverwatchStat)
+        Public Function FilterByHero(stats As IEnumerable(Of OverwatchStat), heroName As String) As IEnumerable(Of OverwatchStat)
             Return stats.Where(Function(s) s.Hero.ToLower = heroName.RemoveWhitespace.ToLower)
         End Function
 
@@ -19,16 +19,16 @@ Namespace Extensions
         ''' </summary>
         ''' <returns>A collection of filtered stats.</returns>
         <Extension()>
-        Function FilterByCategory(stats As IEnumerable(Of OverwatchStat), categoryName As String) As IEnumerable(Of OverwatchStat)
+        Public Function FilterByCategory(stats As IEnumerable(Of OverwatchStat), categoryName As String) As IEnumerable(Of OverwatchStat)
             Return stats.Where(Function(s) s.Category = categoryName)
         End Function
 
         ''' <summary>
-        ''' Get an achievement by its name.
+        ''' Get a stat by its name.
         ''' </summary>
         ''' <returns>A collection of filtered stats.</returns>
         <Extension()>
-        Function FilterByName(stats As IEnumerable(Of OverwatchStat), statName As String) As OverwatchStat
+        Public Function FilterByName(stats As IEnumerable(Of OverwatchStat), statName As String) As OverwatchStat
             Return stats.Where(Function(s) s.Name = statName).FirstOrDefault
         End Function
 
@@ -37,7 +37,7 @@ Namespace Extensions
         ''' </summary>
         ''' <returns>A collection of filtered stats.</returns>
         <Extension()>
-        Function GetStatExact(stats As IEnumerable(Of OverwatchStat), heroName As String, categoryName As String, statName As String) As OverwatchStat
+        Public Function GetStatExact(stats As IEnumerable(Of OverwatchStat), heroName As String, categoryName As String, statName As String) As OverwatchStat
             Return stats.FilterByHero(heroName).FilterByCategory(categoryName).FilterByName(statName)
         End Function
 
@@ -46,7 +46,7 @@ Namespace Extensions
         ''' </summary>
         ''' <returns>A collection of filtered achievements.</returns>
         <Extension()>
-        Function FilterByCategory(achievements As IEnumerable(Of OverwatchAchievement), category As OverwatchAchievementCategory) As IEnumerable(Of OverwatchAchievement)
+        Public Function FilterByCategory(achievements As IEnumerable(Of OverwatchAchievement), category As OverwatchAchievementCategory) As IEnumerable(Of OverwatchAchievement)
             Return achievements.Where(Function(a) a.Category = category)
         End Function
 
@@ -55,7 +55,7 @@ Namespace Extensions
         ''' </summary>
         ''' <returns>A collection of filtered achievements.</returns>
         <Extension()>
-        Function FilterByName(achievements As IEnumerable(Of OverwatchAchievement), achievementName As String) As OverwatchAchievement
+        Public Function FilterByName(achievements As IEnumerable(Of OverwatchAchievement), achievementName As String) As OverwatchAchievement
             Return achievements.FirstOrDefault(Function(a) a.Name.ToLower = achievementName.ToLower)
         End Function
     End Module

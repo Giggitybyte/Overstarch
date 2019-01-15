@@ -18,7 +18,9 @@ Namespace Internal
 
         Friend Async Function ParseAsync(username As String, platform As OverwatchPlatform) As Task(Of OverwatchPlayer)
             ' Scrape data from profile.
-            Dim profileWebpage As IDocument = Await _webpageParser.OpenAsync($"{OverstarchUtilities.BaseUrl}/career/{platform.ToString.ToLower}/{username.Replace("#"c, "-"c)}")
+
+            Dim profileUrl As String = $"{OverstarchUtilities.BaseUrl}/career/{platform.ToString.ToLower}/{username.Replace("#"c, "-"c)}"
+            Dim profileWebpage As IDocument = Await _webpageParser.OpenAsync(profileUrl)
             Dim player As New OverwatchPlayer
 
             If profileWebpage.QuerySelector("h1.u-align-center")?.FirstChild.TextContent = "Profile Not Found" Then
@@ -32,6 +34,7 @@ Namespace Internal
                     .Endorsements = ParseEndorsements(profileWebpage.QuerySelector("div.endorsement-level"))
                     .BlizzardId = _playerIdRegex.Match(profileWebpage.QuerySelectorAll("script").Last.TextContent).Value
                     .IsProfilePrivate = profileWebpage.QuerySelector(".masthead-permission-level-text")?.TextContent = "Private Profile"
+                    .ProfileUrl = profileUrl
                     .Platform = platform
                     .PlayerPortraitBorderImageUrl = ParseLevelImageUrl(profileWebpage.QuerySelector("div.player-level"))
                     .Stats = ParseStats(profileWebpage)
