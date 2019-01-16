@@ -26,8 +26,8 @@
         ''' <summary>
         ''' The value of this stat.
         ''' </summary>
-        ''' <returns>A <see cref="String"/></returns>
-        Public Property Value As String
+        ''' <returns>A <see cref="Double"/></returns>
+        Public Property Value As Double
 
     End Class
 End Namespace

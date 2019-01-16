@@ -1,7 +1,7 @@
 ﻿Imports System.Text.RegularExpressions
 Imports AngleSharp
 Imports AngleSharp.Dom
-Imports AngleSharp.Dom.Html
+Imports AngleSharp.Html.Dom
 Imports Newtonsoft.Json
 Imports Overstarch.Entities
 Imports Overstarch.Enums
@@ -14,7 +14,7 @@ Namespace Internal
     ''' </summary>
     Friend NotInheritable Class OverwatchProfileParser
         Private ReadOnly _playerIdRegex As Regex = New Regex("\d+")
-        Private ReadOnly _webpageParser As BrowsingContext = BrowsingContext.[New](Configuration.Default.WithDefaultLoader)
+        Private Shared ReadOnly _webpageParser As BrowsingContext = BrowsingContext.[New](Configuration.Default.WithDefaultLoader)
 
         Friend Async Function ParseAsync(username As String, platform As OverwatchPlatform) As Task(Of OverwatchPlayer)
             ' Scrape data from profile.
@@ -123,27 +123,29 @@ Namespace Internal
                 Dim gamemodeStats As New List(Of OverwatchStat)
 
                 If gamemodeContent IsNot Nothing Then
-                    For Each hero In gamemodeContent.QuerySelectorAll("select > option")
-                        Dim id As String = hero.GetAttribute("value")
-
-                        If id.StartsWith("0x0") Then
-                            Dim heroName As String = FormatHeroName(hero.TextContent)
-                            If Not String.IsNullOrEmpty(heroName) Then heroIdDict.Add(id, heroName)
-                        End If
+                    For Each hero As IHtmlOptionElement In gamemodeContent.QuerySelectorAll("option[value^='0x02E']")
+                        Dim heroName As String = FormatHeroName(hero.TextContent)
+                        If Not String.IsNullOrEmpty(heroName) Then heroIdDict.Add(hero.Value, heroName)
                     Next
 
-                    For Each section In profile.QuerySelectorAll("div[data-group-id='stats']")
+                    For Each section In gamemodeContent.QuerySelectorAll("div[data-group-id='stats']")
                         Dim categoryId As String = section.GetAttribute("data-category-id")
+
+                        If String.IsNullOrEmpty(categoryId) Then
+                            Throw New FormatException("Blizzard returned invalid data.")
+                        End If
 
                         If heroIdDict.ContainsKey(categoryId) Then
                             For Each dataTable In section.QuerySelectorAll($"div[data-category-id='{categoryId}'] table.DataTable")
                                 For Each dataRow In dataTable.QuerySelectorAll("tbody tr")
+
                                     gamemodeStats.Add(New OverwatchStat With {
                                         .Category = dataTable.QuerySelector("thead").TextContent,
                                         .Hero = heroIdDict(categoryId),
                                         .Name = dataRow.Children(0).TextContent,
-                                        .Value = dataRow.Children(1).TextContent ' TODO: Convert to numeric-only value.
+                                        .Value = dataRow.Children(1).TextContent.ConvertValueToDouble
                                     })
+
                                 Next
                             Next
                         End If
