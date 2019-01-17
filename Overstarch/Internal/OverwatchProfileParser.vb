@@ -162,7 +162,7 @@ Namespace Internal
             If name.ToLower.Contains("all heroes") Then
                 Return "AllHeroes"
             Else
-                Return name.Trim.RemoveDiacritics.RemoveNonAlphanumeric
+                Return name.Trim.RemoveDiacritics.RemoveNonAlphanumeric.RemoveWhitespace
             End If
 
         End Function

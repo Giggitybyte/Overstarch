@@ -11,8 +11,9 @@ Namespace Extensions
         ''' <returns>A <see cref="Double"/> containing a stat value.</returns>
         <Extension()>
         Friend Function ConvertValueToDouble(value As String) As Double
-            Dim timeValue As TimeSpan = Nothing
             Dim doubleValue As Double = Nothing
+            Dim timeValue As TimeSpan = Nothing
+            Dim timeFormats As String() = {"hh\:mm\:ss", "mm\:ss"}
 
             If value.ToLower.Contains("hour") Then
                 Return TimeSpan.FromHours(Integer.Parse(value.Substring(0, value.IndexOf(" ")))).TotalSeconds
@@ -23,10 +24,13 @@ Namespace Extensions
             ElseIf value.Contains(":") = False Then
                 Return If(Double.TryParse(value.Replace(",", "").Replace("%", ""), doubleValue), doubleValue, 0)
 
-            ElseIf TimeSpan.TryParseExact(value, "mm\:ss", CultureInfo.CurrentCulture, timeValue) OrElse
-                Timespan.TryParseExact(value, "hh\:mm\:ss", CultureInfo.CurrentCulture, timeValue) Then
-
+            ElseIf TimeSpan.TryParseExact(value, timeFormats, DateTimeFormatInfo.CurrentInfo, timeValue) Then
                 Return timeValue.TotalSeconds
+
+            Else ' for time values over 24 hours
+                Dim timeParts As String() = value.Split(":"c)
+                If timeParts.Count = 3 Then Return New TimeSpan(timeParts(0), timeParts(1), timeParts(2)).TotalSeconds
+
             End If
 
             Return If(Double.TryParse(value.Replace(",", "").Replace("%", ""), doubleValue), doubleValue, 0)
