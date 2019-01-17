@@ -7,5 +7,5 @@ install:
 
 script:
  - dotnet pack -o $HOME
- - dotnet nuget push *.nupkg -k $NUGETKEY
+ - dotnet nuget push *.nupkg -k $NUGETKEY -s $NUGETURL
  
