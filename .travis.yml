@@ -6,12 +6,6 @@ install:
  - dotnet restore
 
 script:
- - dotnet pack
- 
-deploy:
-  skip_cleanup: true
-  provider: script
-  script: dotnet nuget push *.nupkg -k $NUGETKEY
-  on:
-    branch: development
+ - dotnet pack -o $HOME
+ - dotnet nuget push *.nupkg -k $NUGETKEY
  
