@@ -12,7 +12,7 @@ script:
   fi
  - |
   if [ "${TRAVIS_BRANCH}" == "development" ]; then
-    dotnet pack -o $HOME /p:Version=$PACKAGE_VERSION_$TRAVIS_BUILD_NUMBER-beta
+    dotnet pack -o $HOME /p:Version=$PACKAGE_VERSION\_$TRAVIS_BUILD_NUMBER-beta
   fi
  - dotnet nuget push $HOME/*.nupkg -k $NUGETKEY -s $NUGETURL
  
