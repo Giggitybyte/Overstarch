@@ -25,6 +25,7 @@ Public NotInheritable Class OverwatchClient
 
         If platform = 0 Then
             player = Await PlatformLookupAsync(username)
+
         Else
             If platform = OverwatchPlatform.PC AndAlso Not _battletagRegex.IsMatch(username) Then
                 Throw New ArgumentException("Provided battletag was not valid.")
