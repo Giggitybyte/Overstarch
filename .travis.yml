@@ -3,12 +3,12 @@ mono: none
 dotnet: 2.1.0
 
 install:
-- dotnet restore
+ - dotnet restore
 
 script:
  - dotnet pack
  
- deploy:
+deploy:
   skip_cleanup: true
   provider: script
   script: dotnet nuget push *.nupkg -k $NUGETKEY
