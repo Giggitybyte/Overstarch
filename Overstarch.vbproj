@@ -9,6 +9,7 @@
     <PackageProjectUrl>https://github.com/Giggitybyte/Overstarch</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Giggitybyte/Overstarch</RepositoryUrl>
     <PackageTags>overwatch api player stats</PackageTags>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.10.1" />
+    <PackageReference Include="AngleSharp" Version="0.9.11" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
 

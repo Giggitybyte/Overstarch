@@ -17,4 +17,4 @@ script:
  - dotnet nuget push $HOME/*.nupkg -k $NUGETKEY -s $NUGETURL
  
 env:
- - PACKAGE_VERSION=1.0.0 
+ - PACKAGE_VERSION=1.1.0 

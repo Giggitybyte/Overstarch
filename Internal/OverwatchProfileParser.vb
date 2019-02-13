@@ -1,8 +1,9 @@
-﻿Imports System.Text.RegularExpressions
+﻿Imports System.IO
+Imports System.Text.RegularExpressions
 Imports AngleSharp
 Imports AngleSharp.Dom
-Imports AngleSharp.Html.Dom
-Imports Newtonsoft.Json
+Imports AngleSharp.Dom.Css
+Imports AngleSharp.Dom.Html
 Imports Overstarch.Entities
 Imports Overstarch.Enums
 Imports Overstarch.Extensions
@@ -14,7 +15,7 @@ Namespace Internal
     ''' </summary>
     Friend NotInheritable Class OverwatchProfileParser
         Private ReadOnly _playerIdRegex As Regex = New Regex("\d+")
-        Private Shared ReadOnly _webpageParser As BrowsingContext = BrowsingContext.[New](Configuration.Default.WithDefaultLoader)
+        Private Shared ReadOnly _webpageParser As BrowsingContext = BrowsingContext.[New](Configuration.Default.WithDefaultLoader.WithCss)
 
         Friend Async Function ParseAsync(username As String, platform As OverwatchPlatform) As Task(Of OverwatchPlayer)
             ' Scrape data from profile.
@@ -35,29 +36,36 @@ Namespace Internal
                     .BlizzardId = _playerIdRegex.Match(profileWebpage.QuerySelectorAll("script").Last.TextContent).Value
                     .IsProfilePrivate = profileWebpage.QuerySelector(".masthead-permission-level-text")?.TextContent = "Private Profile"
                     .ProfileUrl = profileUrl
+                    .PlayerIconUrl = DirectCast(profileWebpage.QuerySelector(".player-portrait"), IHtmlImageElement)?.Source
+                    .PlayerLevel = ParsePlayerLevel(profileWebpage.QuerySelector(".masthead-player-progression"))
                     .Platform = platform
-                    .PlayerPortraitBorderImageUrl = ParseLevelImageUrl(profileWebpage.QuerySelector("div.player-level"))
                     .Stats = ParseStats(profileWebpage)
-
-                    ' Fetch remaining data from non-public API.
-                    Dim platformsUrl As String = $"{OverstarchUtilities.BaseUrl}/career/platforms/{ .BlizzardId}"
-                    Dim accounts As List(Of OverwatchApiPlayer) = JsonConvert.DeserializeObject(Of List(Of OverwatchApiPlayer))(OverstarchUtilities.FetchJson(platformsUrl))
-                    Dim currentAccount As OverwatchApiPlayer = accounts.Where(Function(p) p.Platform = player.Platform).FirstOrDefault
-
-                    .Aliases = accounts.Where(Function(a) a.Platform <> platform).ToList
-                    .PlayerIconUrl = $"https://d1u1mce87gyfbn.cloudfront.net/game/unlocks/{currentAccount.PlayerIcon}.png"
-                    .PlayerLevel = currentAccount.Level
-                    .Username = currentAccount.Username
+                    .Username = profileWebpage.QuerySelector(".header-masthead").TextContent
                 End With
             End If
 
-            Return Await Task.FromResult(player)
+            Return player
         End Function
 
-        Private Function ParseLevelImageUrl(levelImageContent As IElement) As String
-            Dim levelImageAttribute As String = levelImageContent.GetAttribute("style")
-            Dim startIndex As Integer = levelImageAttribute.IndexOf("("c) + 1
-            Return levelImageAttribute.Substring(startIndex, levelImageAttribute.IndexOf(")"c) - startIndex)
+        Private Function ParsePlayerLevel(levelContent As IElement) As UShort
+            Dim level As UShort
+            Dim prestigeLevel As UShort
+            Dim prestigeModifier As UShort
+            Dim cssProperty As ICssProperty
+
+            level = levelContent.QuerySelector(".u-vertical-center").TextContent
+
+            cssProperty = levelContent.QuerySelector(".player-level").Style.Children.First
+            prestigeLevel = OverstarchPrestige.PrestigeBorders(Path.GetFileName(New Uri(cssProperty.Value.Split(ChrW(34))(1)).LocalPath).Split("."c)(0))
+            If prestigeLevel <> 0 Then prestigeLevel *= 100
+
+            cssProperty = levelContent.QuerySelector(".player-level .player-rank")?.Style.Children.First
+            If cssProperty IsNot Nothing Then
+                prestigeModifier = OverstarchPrestige.PrestigeStars(Path.GetFileName(New Uri(cssProperty.Value.Split(ChrW(34))(1)).LocalPath).Split("."c)(0))
+            End If
+            If prestigeModifier <> 0 Then prestigeModifier *= 100
+
+            Return level + prestigeLevel + prestigeModifier
         End Function
 
         Private Function ParseEndorsements(endorsementContent As IElement) As Dictionary(Of OverwatchEndorsement, Decimal)
@@ -132,7 +140,7 @@ Namespace Internal
                         Dim categoryId As String = section.GetAttribute("data-category-id")
 
                         If String.IsNullOrEmpty(categoryId) Then
-                            Throw New FormatException("Blizzard returned invalid data.")
+                            Throw New FormatException("Blizzard returned invalid data. Please wait a moment before attempting to retrieve a player profile again.")
                         End If
 
                         If heroIdDict.ContainsKey(categoryId) Then

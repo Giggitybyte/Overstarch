@@ -20,7 +20,8 @@ Namespace Entities
         Public Property BlizzardId As String
 
         ''' <summary>
-        ''' Profiles from other platforms associated with this player.
+        ''' Profiles from other platforms associated with this player.<para/>
+        ''' This will be empty unless it is populated through <see cref="OverwatchClient.GetPlayerAliasesAsync(OverwatchPlayer)"/>
         ''' </summary>
         ''' <returns>A list of <see cref="OverwatchApiPlayer"/></returns>
         Public Property Aliases As List(Of OverwatchApiPlayer)
@@ -44,22 +45,16 @@ Namespace Entities
         Public Property ProfileUrl As String
 
         ''' <summary>
-        ''' The icon for this player profile.
+        ''' The player icon for this player profile.
         ''' </summary>
         ''' <returns>A <see cref="String"/></returns>
         Public Property PlayerIconUrl As String
 
         ''' <summary>
-        ''' The level for this player profile including prestige.
+        ''' The level, including prestige, for this player profile.
         ''' </summary>
         ''' <returns>A <see cref="UShort"/></returns>
         Public Property PlayerLevel As UShort
-
-        ''' <summary>
-        ''' The URL of the portrait border image.
-        ''' </summary>
-        ''' <returns>A <see cref="String"/></returns>
-        Public Property PlayerPortraitBorderImageUrl As String
 
         ''' <summary>
         ''' The skill rating for this player profile.
@@ -74,13 +69,13 @@ Namespace Entities
         Public Property CompetitiveRankImageUrl As String
 
         ''' <summary>
-        ''' The endorsement level for this player.
+        ''' The endorsement level for this player profile.
         ''' </summary>
         ''' <returns>A <see cref="UShort"/></returns>
         Public Property EndorsementLevel As UShort
 
         ''' <summary>
-        ''' A dictionary of endorsement percentages.
+        ''' A dictionary of decimal percentages for endorsements.
         ''' </summary>
         ''' <returns>A dictionary with <see cref="OverwatchEndorsement"/> as the key and a <see cref="Decimal"/> as the value.</returns>
         Public Property Endorsements As Dictionary(Of OverwatchEndorsement, Decimal)

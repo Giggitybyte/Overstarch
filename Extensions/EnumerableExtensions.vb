@@ -55,8 +55,17 @@ Namespace Extensions
         ''' </summary>
         ''' <returns>A specific <see cref="OverwatchAchievement"/>.</returns>
         <Extension()>
-        Public Function FilterByName(achievements As IEnumerable(Of OverwatchAchievement), achievementName As String) As OverwatchAchievement
+        Public Function GetByName(achievements As IEnumerable(Of OverwatchAchievement), achievementName As String) As OverwatchAchievement
             Return achievements.FirstOrDefault(Function(a) a.Name.ToLower = achievementName.ToLower)
+        End Function
+
+        ''' <summary>
+        ''' Get all achieved achievements.
+        ''' </summary>
+        ''' <returns>A collection of <see cref="OverwatchAchievement"/>.</returns>
+        <Extension()>
+        Public Function GetAchieved(achievements As IEnumerable(Of OverwatchAchievement)) As IEnumerable(Of OverwatchAchievement)
+            Return achievements.Where(Function(a) a.HasAchieved)
         End Function
     End Module
 End Namespace

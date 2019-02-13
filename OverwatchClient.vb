@@ -42,6 +42,19 @@ Public NotInheritable Class OverwatchClient
     End Function
 
     ''' <summary>
+    ''' Populates <see cref="OverwatchPlayer.Aliases"/>.
+    ''' </summary>
+    ''' <param name="player"></param>
+    ''' <returns></returns>
+    Public Async Function GetPlayerAliasesAsync(player As OverwatchPlayer) As Task(Of OverwatchPlayer)
+        Dim platformsUrl As String = $"{OverstarchUtilities.BaseUrl}/career/platforms/{player.BlizzardId}"
+        Dim accounts As List(Of OverwatchApiPlayer) = JsonConvert.DeserializeObject(Of List(Of OverwatchApiPlayer))(Await OverstarchUtilities.FetchJsonAsync(platformsUrl))
+
+        player.Aliases = accounts.Where(Function(a) a.Platform <> player.Platform).ToList
+        Return player
+    End Function
+
+    ''' <summary>
     ''' Internal method: performs a lookup of Overwatch players from a username.
     ''' <para>Auto-detects battletags that are passed in and searches lookup results for an exact match and returns it. Non-battletag lookups will simply return the first player from the lookup results.</para>
     ''' </summary>
@@ -49,7 +62,7 @@ Public NotInheritable Class OverwatchClient
     ''' <returns>An <see cref="OverwatchPlayer"/> object.</returns>
     Private Async Function PlatformLookupAsync(username As String) As Task(Of OverwatchPlayer)
         Dim lookupUrl As String = $"{OverstarchUtilities.BaseUrl}/search/account-by-name/{Uri.EscapeUriString(username)}"
-        Dim lookupResults As List(Of OverwatchApiPlayer) = JsonConvert.DeserializeObject(Of List(Of OverwatchApiPlayer))(OverstarchUtilities.FetchJson(lookupUrl))
+        Dim lookupResults As List(Of OverwatchApiPlayer) = JsonConvert.DeserializeObject(Of List(Of OverwatchApiPlayer))(Await OverstarchUtilities.FetchJsonAsync(lookupUrl))
 
         If lookupResults.Count = 0 Then
             Throw New ArgumentException("There are no Overwatch players with that username.")
