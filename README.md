@@ -1,5 +1,5 @@
 # Overstarch
-[![Build Status](https://img.shields.io/travis/Giggitybyte/Overstarch/development.svg?style=for-the-badge)](https://travis-ci.org/Giggitybyte/Overstarch) [![NuGet](https://img.shields.io/nuget/vpre/Overstarch.svg?style=for-the-badge)](https://nuget.org/packages/DSharpPlus)
+[![Build Status](https://img.shields.io/travis/Giggitybyte/Overstarch/development.svg?style=for-the-badge)](https://travis-ci.org/Giggitybyte/Overstarch) [![NuGet](https://img.shields.io/nuget/vpre/Overstarch.svg?style=for-the-badge)](https://nuget.org/packages/Overstarch)
 
 *Overstarch* is a .Net Core library written in Visual Basic that allows access to player information and stats for [Overwatch](https://en.wikipedia.org/wiki/Overwatch_(video_game)) by scraping user profiles and using hidden, non-public Blizzard APIs.
 
