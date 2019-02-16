@@ -125,14 +125,7 @@ Namespace Entities
             Dim json As String = Await OverstarchUtilities.FetchJsonAsync(platformsUrl).ConfigureAwait(False)
             Dim accounts As List(Of OverwatchApiPlayer) = JsonConvert.DeserializeObject(Of List(Of OverwatchApiPlayer))(json)
 
-            For index As Integer = 0 To accounts.Count - 1
-                Dim account As OverwatchApiPlayer = accounts(index)
-
-                If account.Platform = Platform Then
-                    accounts.Remove(account)
-                End If
-            Next
-
+            accounts.RemoveAll(Function(a) a.Platform = Platform)
             _Aliases = accounts
         End Function
     End Class

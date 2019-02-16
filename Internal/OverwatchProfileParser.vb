@@ -72,7 +72,11 @@ Namespace Internal
         End Function
 
         Private Function ParseEndorsements(endorsementContent As IElement) As IReadOnlyDictionary(Of OverwatchEndorsement, Decimal)
-            Dim endorsements As New Dictionary(Of OverwatchEndorsement, Decimal)
+            Dim endorsements As New Dictionary(Of OverwatchEndorsement, Decimal) From {
+                {OverwatchEndorsement.GoodTeammate, 0.0},
+                {OverwatchEndorsement.Shotcaller, 0.0},
+                {OverwatchEndorsement.Sportsmanship, 0.0}
+            }
 
             If endorsementContent IsNot Nothing Then
                 For Each endorsement As IElement In endorsementContent.QuerySelectorAll("svg")
@@ -91,7 +95,7 @@ Namespace Internal
                                 endorsementEnum = OverwatchEndorsement.Sportsmanship
                         End Select
 
-                        endorsements.Add(endorsementEnum, Decimal.Parse(percentage))
+                        endorsements(endorsementEnum) = Decimal.Parse(percentage)
                     End If
                 Next
             End If
