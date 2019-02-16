@@ -1,8 +1,7 @@
 ﻿Namespace Internal
 
     ''' <summary>
-    ''' Internal structure.<para/>
-    ''' Contains constants for prestige borders and prestige stars.
+    ''' Internal structure containing constants for prestige borders and prestige stars.
     ''' </summary>
     Friend Structure OverstarchPrestige
         Private Shared _borders As New Dictionary(Of String, Integer) From {

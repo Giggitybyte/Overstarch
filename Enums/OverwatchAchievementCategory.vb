@@ -8,31 +8,32 @@
         ''' <summary>
         ''' General achievement.
         ''' </summary>
-        GENERAL
+        General
 
         ''' <summary>
         ''' Damage hero achievement.
         ''' </summary>
-        DAMAGE
+        Damage
 
         ''' <summary>
         ''' Tank hero achievement.
         ''' </summary>
-        TANK
+        Tank
 
         ''' <summary>
         ''' Support hero achievement.
         ''' </summary>
-        SUPPORT
+        Support
 
         ''' <summary>
         ''' Map related achievement.
         ''' </summary>
-        MAPS
+        Maps
 
         ''' <summary>
         ''' Special achievement.
         ''' </summary>
-        SPECIAL
+        Special
+
     End Enum
 End Namespace

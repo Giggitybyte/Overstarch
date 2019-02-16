@@ -9,45 +9,52 @@ Namespace Entities
     Public NotInheritable Class OverwatchApiPlayer
 
         ''' <summary>
-        ''' The platform for this player profile.
+        ''' Internal field for JSON deserialization.
         ''' </summary>
-        ''' <returns>An <see cref="OverwatchPlatform"/></returns>
+        <JsonProperty("id")>
+        Friend _blizzardId As String
+
+        ''' <summary>
+        ''' Internal field for JSON deserialization.
+        ''' </summary>
         <JsonProperty("platform")>
-        Public Property Platform As OverwatchPlatform
+        Friend _platform As OverwatchPlatform
+
+        ''' <summary>
+        ''' Internal field for JSON deserialization.
+        ''' </summary>
+        <JsonProperty("name")>
+        Friend _username As String
 
         ''' <summary>
         ''' The Blizzard player ID for this player.
         ''' </summary>
         ''' <returns>A <see cref="String"/></returns>
-        <JsonProperty("id")>
-        Public Property BlizzardId As String
+        Public ReadOnly Property BlizzardId As String
+            Get
+                Return _blizzardId
+            End Get
+        End Property
+
+        ''' <summary>
+        ''' The platform for this player profile.
+        ''' </summary>
+        ''' <returns>An <see cref="OverwatchPlatform"/></returns>
+        Public ReadOnly Property Platform As OverwatchPlatform
+            Get
+                Return _platform
+            End Get
+        End Property
 
         ''' <summary>
         ''' The username for this player profile.
         ''' </summary>
         ''' <returns>A <see cref="String"/></returns>
-        <JsonProperty("name")>
-        Public Property Username As String
+        Public ReadOnly Property Username As String
+            Get
+                Return _username
+            End Get
+        End Property
 
-        ''' <summary>
-        ''' The level for this player profile.
-        ''' </summary>
-        ''' <returns>An <see cref="Integer"/></returns>
-        <JsonProperty("playerLevel")>
-        Friend Property Level As Integer
-
-        ''' <summary>
-        ''' The player icon for this player profile.
-        ''' </summary>
-        ''' <returns>A <see cref="String"/></returns>
-        <JsonProperty("portrait")>
-        Friend Property PlayerIcon As String
-
-        ''' <summary>
-        ''' Whether or not this player profile is viewable by the public.
-        ''' </summary>
-        ''' <returns>A <see cref="Boolean"/></returns>
-        <JsonProperty("isPublic")>
-        Friend Property IsProfilePublic As Boolean
     End Class
 End Namespace

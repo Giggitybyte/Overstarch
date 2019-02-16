@@ -1,4 +1,5 @@
-﻿Imports System.IO
+﻿Imports System.Collections.ObjectModel
+Imports System.IO
 Imports System.Text.RegularExpressions
 Imports AngleSharp
 Imports AngleSharp.Dom
@@ -14,37 +15,39 @@ Namespace Internal
     ''' Internal class for parsing an Overwatch profile.
     ''' </summary>
     Friend NotInheritable Class OverwatchProfileParser
-        Private ReadOnly _playerIdRegex As Regex = New Regex("\d+")
+        Private Shared ReadOnly _playerIdRegex As Regex = New Regex("\d+")
         Private Shared ReadOnly _webpageParser As BrowsingContext = BrowsingContext.[New](Configuration.Default.WithDefaultLoader.WithCss)
 
         Friend Async Function ParseAsync(username As String, platform As OverwatchPlatform) As Task(Of OverwatchPlayer)
-            ' Scrape data from profile.
-
             Dim profileUrl As String = $"{OverstarchUtilities.BaseUrl}/career/{platform.ToString.ToLower}/{username.Replace("#"c, "-"c)}"
-            Dim profileWebpage As IDocument = Await _webpageParser.OpenAsync(profileUrl)
-            Dim player As New OverwatchPlayer
+            Dim profileWebpage As IDocument = Await _webpageParser.OpenAsync(profileUrl).ConfigureAwait(False)
 
             If profileWebpage.QuerySelector("h1.u-align-center")?.FirstChild.TextContent = "Profile Not Found" Then
                 Throw New ArgumentException("Provided username does not exist On this platform.")
-            Else
-                With player
-                    .Achievements = ParseAchievements(profileWebpage.QuerySelector("section[id='achievements-section']"))
-                    .CompetitiveSkillRating = If(UShort.TryParse(profileWebpage.QuerySelector("div.competitive-rank div")?.TextContent, .CompetitiveSkillRating), .CompetitiveSkillRating, 0)
-                    .CompetitiveRankImageUrl = If(TryCast(profileWebpage.QuerySelector("div.competitive-rank img"), IHtmlImageElement)?.Source, String.Empty)
-                    .EndorsementLevel = If(UShort.TryParse(profileWebpage.QuerySelector("div.endorsement-level div.u-center")?.TextContent, .EndorsementLevel), .EndorsementLevel, 0)
-                    .Endorsements = ParseEndorsements(profileWebpage.QuerySelector("div.endorsement-level"))
-                    .BlizzardId = _playerIdRegex.Match(profileWebpage.QuerySelectorAll("script").Last.TextContent).Value
-                    .IsProfilePrivate = profileWebpage.QuerySelector(".masthead-permission-level-text")?.TextContent = "Private Profile"
-                    .ProfileUrl = profileUrl
-                    .PlayerIconUrl = DirectCast(profileWebpage.QuerySelector(".player-portrait"), IHtmlImageElement)?.Source
-                    .PlayerLevel = ParsePlayerLevel(profileWebpage.QuerySelector(".masthead-player-progression"))
-                    .Platform = platform
-                    .Stats = ParseStats(profileWebpage)
-                    .Username = profileWebpage.QuerySelector(".header-masthead").TextContent
-                End With
-            End If
 
-            Return player
+            Else
+                Dim achievements = ParseAchievements(profileWebpage.QuerySelector("section[id='achievements-section']"))
+                Dim blizzardId = _playerIdRegex.Match(profileWebpage.QuerySelectorAll("script").Last.TextContent).Value
+                Dim competitiveRankImageUrl = If(TryCast(profileWebpage.QuerySelector("div.competitive-rank img"), IHtmlImageElement)?.Source, String.Empty)
+                Dim endorsements = ParseEndorsements(profileWebpage.QuerySelector("div.endorsement-level"))
+                Dim isProfilePrivate = profileWebpage.QuerySelector(".masthead-permission-level-text")?.TextContent = "Private Profile"
+                Dim playerIconUrl = DirectCast(profileWebpage.QuerySelector(".player-portrait"), IHtmlImageElement)?.Source
+                Dim playerLevel = ParsePlayerLevel(profileWebpage.QuerySelector(".masthead-player-progression"))
+                Dim stats = ParseStats(profileWebpage)
+
+                Dim competitiveSkillRating As UShort = 0
+                Dim endorsementLevel As UShort = 0
+
+                UShort.TryParse(profileWebpage.QuerySelector("div.competitive-rank div")?.TextContent, competitiveSkillRating)
+                UShort.TryParse(profileWebpage.QuerySelector("div.endorsement-level div.u-center")?.TextContent, endorsementLevel)
+                username = profileWebpage.QuerySelector(".header-masthead").TextContent
+
+                Return New OverwatchPlayer(achievements, blizzardId, competitiveRankImageUrl,
+                                           competitiveSkillRating, endorsementLevel, endorsements,
+                                           isProfilePrivate, platform, playerIconUrl,
+                                           playerLevel, profileUrl, stats, username)
+
+            End If
         End Function
 
         Private Function ParsePlayerLevel(levelContent As IElement) As UShort
@@ -68,7 +71,7 @@ Namespace Internal
             Return level + prestigeLevel + prestigeModifier
         End Function
 
-        Private Function ParseEndorsements(endorsementContent As IElement) As Dictionary(Of OverwatchEndorsement, Decimal)
+        Private Function ParseEndorsements(endorsementContent As IElement) As IReadOnlyDictionary(Of OverwatchEndorsement, Decimal)
             Dim endorsements As New Dictionary(Of OverwatchEndorsement, Decimal)
 
             If endorsementContent IsNot Nothing Then
@@ -81,11 +84,11 @@ Namespace Internal
 
                         Select Case endorsementName
                             Case "teammate"
-                                endorsementEnum = OverwatchEndorsement.GOODTEAMMATE
+                                endorsementEnum = OverwatchEndorsement.GoodTeammate
                             Case "shotcaller"
-                                endorsementEnum = OverwatchEndorsement.SHOTCALLER
+                                endorsementEnum = OverwatchEndorsement.Shotcaller
                             Case "sportsmanship"
-                                endorsementEnum = OverwatchEndorsement.SPORTSMANSHIP
+                                endorsementEnum = OverwatchEndorsement.Sportsmanship
                         End Select
 
                         endorsements.Add(endorsementEnum, Decimal.Parse(percentage))
@@ -96,25 +99,23 @@ Namespace Internal
             Return endorsements
         End Function
 
-        Private Function ParseAchievements(achievementContent As IElement) As List(Of OverwatchAchievement)
+        Private Function ParseAchievements(achievementContent As IElement) As IReadOnlyList(Of OverwatchAchievement)
             Dim achievements As New List(Of OverwatchAchievement)
 
             If achievementContent IsNot Nothing Then
-                For Each category As IElement In achievementContent.QuerySelectorAll("select > option")
-                    Dim categoryData As IElement = achievementContent.QuerySelector($"div[data-category-id='{category.GetAttribute("value")}']")
+                For Each categoryElement As IElement In achievementContent.QuerySelectorAll("select > option")
+                    Dim categoryData As IElement = achievementContent.QuerySelector($"div[data-category-id='{categoryElement.GetAttribute("value")}']")
 
                     For Each achievementData As IHtmlDivElement In categoryData.QuerySelectorAll("div.achievement-card")
-                        Dim achievement As New OverwatchAchievement
 
-                        With achievement
-                            [Enum].TryParse(category.GetAttribute("option-id").ToUpper, .Category)
-                            .Name = achievementData.QuerySelector("div.media-card-title").TextContent
-                            .Description = categoryData.QuerySelector($"div[id='{achievementData.Dataset("tooltip")}']").QuerySelector("p[class='h6']").TextContent
-                            .IconUrl = If(TryCast(achievementData.QuerySelector("img.media-card-fill"), IHtmlImageElement).Source, String.Empty)
-                            .HasAchieved = Not achievementData.GetAttribute("class").Contains("m-disabled")
-                        End With
+                        Dim category As OverwatchAchievementCategory
+                        Dim description As String = categoryData.QuerySelector($"div[id='{achievementData.Dataset("tooltip")}']").QuerySelector("p[class='h6']").TextContent
+                        Dim iconUrl As String = If(TryCast(achievementData.QuerySelector("img.media-card-fill"), IHtmlImageElement).Source, String.Empty)
+                        Dim hasAchieved As Boolean = Not achievementData.GetAttribute("class").Contains("m-disabled")
+                        Dim name As String = achievementData.QuerySelector("div.media-card-title").TextContent
 
-                        achievements.Add(achievement)
+                        [Enum].TryParse(categoryElement.GetAttribute("option-id").ToUpper, category)
+                        achievements.Add(New OverwatchAchievement(category, description, hasAchieved, iconUrl, name))
                     Next
                 Next
             End If
@@ -122,8 +123,8 @@ Namespace Internal
             Return achievements
         End Function
 
-        Private Function ParseStats(profile As IDocument) As Dictionary(Of OverwatchGamemode, List(Of OverwatchStat))
-            Dim playerStats As New Dictionary(Of OverwatchGamemode, List(Of OverwatchStat))
+        Private Function ParseStats(profile As IDocument) As IReadOnlyDictionary(Of OverwatchGamemode, IReadOnlyList(Of OverwatchStat))
+            Dim playerStats As New Dictionary(Of OverwatchGamemode, IReadOnlyList(Of OverwatchStat))
 
             For Each gamemode In GetType(OverwatchGamemode).GetEnumNames
                 Dim gamemodeContent As IElement = profile.QuerySelector($"div[id='{gamemode.ToLower}']")
@@ -147,12 +148,12 @@ Namespace Internal
                             For Each dataTable In section.QuerySelectorAll($"div[data-category-id='{categoryId}'] table.DataTable")
                                 For Each dataRow In dataTable.QuerySelectorAll("tbody tr")
 
-                                    gamemodeStats.Add(New OverwatchStat With {
-                                        .Category = dataTable.QuerySelector("thead").TextContent,
-                                        .Hero = heroIdDict(categoryId),
-                                        .Name = dataRow.Children(0).TextContent,
-                                        .Value = dataRow.Children(1).TextContent.ConvertValueToDouble
-                                    })
+                                    Dim category As String = dataTable.QuerySelector("thead").TextContent
+                                    Dim hero As String = heroIdDict(categoryId)
+                                    Dim name As String = dataRow.Children(0).TextContent
+                                    Dim value As String = dataRow.Children(1).TextContent.ConvertValueToDouble
+
+                                    gamemodeStats.Add(New OverwatchStat(category, hero, name, value))
 
                                 Next
                             Next

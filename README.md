@@ -1,11 +1,9 @@
-# Overstarch
-[![Build Status](https://img.shields.io/travis/Giggitybyte/Overstarch/development.svg?style=for-the-badge)](https://travis-ci.org/Giggitybyte/Overstarch) [![NuGet](https://img.shields.io/nuget/vpre/Overstarch.svg?style=for-the-badge)](https://nuget.org/packages/Overstarch)
-
+# Overstarch [![Build Status](https://img.shields.io/travis/Giggitybyte/Overstarch/development.svg?style=for-the-badge)](https://travis-ci.org/Giggitybyte/Overstarch) [![NuGet](https://img.shields.io/nuget/vpre/Overstarch.svg?style=for-the-badge)](https://nuget.org/packages/Overstarch)
 *Overstarch* is a .Net Core library written in Visual Basic that allows access to player information and stats for [Overwatch](https://en.wikipedia.org/wiki/Overwatch_(video_game)) by scraping user profiles and using hidden, non-public Blizzard APIs.
 
 This library is intended to be a replacement for the seemingly abandoned [Overwatch.Net](https://github.com/sirdoombox/Overwatch.Net).
 
-## Quick Start
+## Getting Started
 Each method in *Overstarch* has docstrings, so it should be fairly easy to understand what each method does and how to use them.
 Nevertheless, below are some snippets of code that will give you the general idea on how to use this library.
 
@@ -21,9 +19,9 @@ Nevertheless, below are some snippets of code that will give you the general ide
         Console.WriteLine($"Private Profile: {owPlayer.IsProfilePrivate}");
 
         // Player stats example.
-        OverwatchStat compGamesWon = owPlayer.Stats(OverwatchGamemode.COMPETITIVE).GetStatExact("All Heroes", "Game", "Games Won");
-        OverwatchStat qpTotalElims = owPlayer.Stats(OverwatchGamemode.QUICKPLAY).GetStatExact("All Heroes", "Combat", "Eliminations");
-        OverwatchStat brigDmgDone = owPlayer.Stats(OverwatchGamemode.QUICKPLAY).GetStatExact("Brigitte", "Combat", "All Damage Done");
+        OverwatchStat compGamesWon = owPlayer.Stats(OverwatchGamemode.Competitive).GetStatExact("All Heroes", "Game", "Games Won");
+        OverwatchStat qpTotalElims = owPlayer.Stats(OverwatchGamemode.Quickplay).GetStatExact("All Heroes", "Combat", "Eliminations");
+        OverwatchStat brigDmgDone = owPlayer.Stats(OverwatchGamemode.Quickplay).GetStatExact("Brigitte", "Combat", "All Damage Done");
 
         Console.WriteLine($"Competitive Games Won: {compGamesWon.Value}");
         Console.WriteLine($"Quick Play Elims: {qpTotalElims.Value}");
@@ -32,7 +30,7 @@ Nevertheless, below are some snippets of code that will give you the general ide
         // Player achievements example.
         OverwatchAchievement undyingAchievement = owPlayer.Achievements.GetByName("Undying");
         OverwatchAchievement shutoutAchievement = owPlayer.Achievements.GetByName("Shutout");
-        List<OverwatchAchievement> mapAchievements = owPlayer.Achievements.FilterByCategory(OverwatchAchievementCategory.MAPS);
+        List<OverwatchAchievement> mapAchievements = owPlayer.Achievements.FilterByCategory(OverwatchAchievementCategory.Maps);
 
         Console.WriteLine($"Undying Achievement Unlocked: {undyingAchievement.HasAchieved}");
         Console.WriteLine($"Shutout Achievement Description: {shutoutAchievement.Description}");
@@ -50,9 +48,9 @@ Nevertheless, below are some snippets of code that will give you the general ide
         Console.WriteLine($"Private Profile: {owPlayer.IsProfilePrivate}")
 
         ' Player stats example.
-        Dim compGamesWon As OverwatchStat = owPlayer.Stats(OverwatchGamemode.COMPETITIVE).GetStatExact("All Heroes", "Game", "Games Won")
-        Dim qpTotalElims As OverwatchStat = owPlayer.Stats(OverwatchGamemode.QUICKPLAY).GetStatExact("All Heroes", "Combat", "Eliminations")
-        Dim brigDmgDone As OverwatchStat = owPlayer.Stats(OverwatchGamemode.QUICKPLAY).GetStatExact("Brigitte", "Combat", "All Damage Done")
+        Dim compGamesWon As OverwatchStat = owPlayer.Stats(OverwatchGamemode.Competitive).GetStatExact("All Heroes", "Game", "Games Won")
+        Dim qpTotalElims As OverwatchStat = owPlayer.Stats(OverwatchGamemode.Quickplay).GetStatExact("All Heroes", "Combat", "Eliminations")
+        Dim brigDmgDone As OverwatchStat = owPlayer.Stats(OverwatchGamemode.Quickplay).GetStatExact("Brigitte", "Combat", "All Damage Done")
 
         Console.WriteLine($"Competitive Games Won: {compGamesWon.Value}")
         Console.WriteLine($"Quick Play Elims: {qpTotalElims.Value}")
@@ -61,7 +59,7 @@ Nevertheless, below are some snippets of code that will give you the general ide
         ' Player achievements example.
         Dim undyingAchievement As OverwatchAchievement = owPlayer.Achievements.GetByName("Undying")
         Dim shutoutAchievement As OverwatchAchievement = owPlayer.Achievements.GetByName("Shutout")
-        Dim mapAchievements As List(Of OverwatchAchievement) = owPlayer.Achievements.FilterByCategory(OverwatchAchievementCategory.MAPS)
+        Dim mapAchievements As List(Of OverwatchAchievement) = owPlayer.Achievements.FilterByCategory(OverwatchAchievementCategory.Maps)
 
         Console.WriteLine($"Undying Achievement Unlocked: {undyingAchievement.HasAchieved}")
         Console.WriteLine($"Shutout Achievement Description: {shutoutAchievement.Description}")

@@ -8,11 +8,12 @@
         ''' <summary>
         ''' Quick Play.
         ''' </summary>
-        QUICKPLAY
+        Quickplay
 
         ''' <summary>
         ''' Competitive.
         ''' </summary>
-        COMPETITIVE
+        Competitive
+
     End Enum
 End Namespace

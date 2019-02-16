@@ -9,9 +9,9 @@ Imports Overstarch.Internal
 ''' </summary>
 Public NotInheritable Class OverwatchClient
     Private ReadOnly _profileParser As New OverwatchProfileParser
-    Private ReadOnly _battletagRegex As Regex = New Regex("\w+#\d+")
-    Private ReadOnly _psnIdRegex As Regex = New Regex("^[a-zA-Z]{1}[\w\d-]{2,12}$")
-    Private ReadOnly _xblIdRegex As Regex = New Regex("^[a-zA-Z0-9\s]{1,15}$")
+    Private Shared ReadOnly _battletagRegex As Regex = New Regex("\w+#\d+")
+    Private Shared ReadOnly _psnIdRegex As Regex = New Regex("[a-zA-Z]{1}[\w\d-]{2,12}")
+    Private Shared ReadOnly _xblIdRegex As Regex = New Regex("[a-zA-Z0-9\s]{1,15}")
 
     ''' <summary>
     ''' Fetches data and stats for an Overwatch player.
@@ -24,7 +24,7 @@ Public NotInheritable Class OverwatchClient
         Dim player As OverwatchPlayer
 
         If platform = 0 Then
-            player = Await PlatformLookupAsync(username)
+            player = Await PlatformLookupAsync(username).ConfigureAwait(False)
 
         Else
             If platform = OverwatchPlatform.PC AndAlso Not _battletagRegex.IsMatch(username) Then
@@ -35,24 +35,16 @@ Public NotInheritable Class OverwatchClient
                 Throw New ArgumentException("Provided gamertag was not valid.")
             End If
 
-            player = Await _profileParser.ParseAsync(username, platform)
+            player = Await _profileParser.ParseAsync(username, platform).ConfigureAwait(False)
+        End If
+
+        If player Is Nothing Then
+
         End If
 
         Return player
     End Function
 
-    ''' <summary>
-    ''' Populates <see cref="OverwatchPlayer.Aliases"/>.
-    ''' </summary>
-    ''' <param name="player"></param>
-    ''' <returns></returns>
-    Public Async Function GetPlayerAliasesAsync(player As OverwatchPlayer) As Task(Of OverwatchPlayer)
-        Dim platformsUrl As String = $"{OverstarchUtilities.BaseUrl}/career/platforms/{player.BlizzardId}"
-        Dim accounts As List(Of OverwatchApiPlayer) = JsonConvert.DeserializeObject(Of List(Of OverwatchApiPlayer))(Await OverstarchUtilities.FetchJsonAsync(platformsUrl))
-
-        player.Aliases = accounts.Where(Function(a) a.Platform <> player.Platform).ToList
-        Return player
-    End Function
 
     ''' <summary>
     ''' Internal method: performs a lookup of Overwatch players from a username.
@@ -62,7 +54,7 @@ Public NotInheritable Class OverwatchClient
     ''' <returns>An <see cref="OverwatchPlayer"/> object.</returns>
     Private Async Function PlatformLookupAsync(username As String) As Task(Of OverwatchPlayer)
         Dim lookupUrl As String = $"{OverstarchUtilities.BaseUrl}/search/account-by-name/{Uri.EscapeUriString(username)}"
-        Dim lookupResults As List(Of OverwatchApiPlayer) = JsonConvert.DeserializeObject(Of List(Of OverwatchApiPlayer))(Await OverstarchUtilities.FetchJsonAsync(lookupUrl))
+        Dim lookupResults As List(Of OverwatchApiPlayer) = JsonConvert.DeserializeObject(Of List(Of OverwatchApiPlayer))(Await OverstarchUtilities.FetchJsonAsync(lookupUrl).ConfigureAwait(False))
 
         If lookupResults.Count = 0 Then
             Throw New ArgumentException("There are no Overwatch players with that username.")
@@ -71,13 +63,13 @@ Public NotInheritable Class OverwatchClient
                 Dim matchedPlayer As OverwatchApiPlayer = lookupResults.Where(Function(r) r.Username.ToLower = username.ToLower).FirstOrDefault
 
                 If matchedPlayer IsNot Nothing Then
-                    Return Await GetPlayerAsync(matchedPlayer.Username, matchedPlayer.Platform)
+                    Return Await GetPlayerAsync(matchedPlayer.Username, matchedPlayer.Platform).ConfigureAwait(False)
                 Else
                     Throw New ArgumentException("Provided battletag does not exist.")
                 End If
             Else
                 Dim result As OverwatchApiPlayer = lookupResults.First
-                Return Await GetPlayerAsync(result.Username, result.Platform)
+                Return Await GetPlayerAsync(result.Username, result.Platform).ConfigureAwait(False)
             End If
         End If
     End Function

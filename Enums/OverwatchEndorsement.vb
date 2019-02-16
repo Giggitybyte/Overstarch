@@ -8,16 +8,17 @@
         ''' <summary>
         ''' Shotcaller endorsement.
         ''' </summary>
-        SHOTCALLER
+        Shotcaller
 
         ''' <summary>
         ''' Good teammate endorsement.
         ''' </summary>
-        GOODTEAMMATE
+        GoodTeammate
 
         ''' <summary>
         ''' Sportsmanship endorsement.
         ''' </summary>
-        SPORTSMANSHIP
+        Sportsmanship
+
     End Enum
 End Namespace
