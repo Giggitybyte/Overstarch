@@ -64,7 +64,8 @@ Namespace Internal
 
             cssProperty = levelContent.QuerySelector(".player-level .player-rank")?.Style.Children.First
             If cssProperty IsNot Nothing Then
-                prestigeModifier = OverstarchPrestige.PrestigeStars(Path.GetFileName(New Uri(cssProperty.Value.Split(ChrW(34))(1)).LocalPath).Split("."c)(0))
+                Dim uid As String = Path.GetFileName(New Uri(cssProperty.Value.Split(ChrW(34))(1)).LocalPath).Split("."c)(0)
+                If Not String.IsNullOrEmpty(uid) Then prestigeModifier = OverstarchPrestige.PrestigeStars(uid)
             End If
             If prestigeModifier <> 0 Then prestigeModifier *= 100
 
