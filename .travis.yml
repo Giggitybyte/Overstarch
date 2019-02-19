@@ -1,0 +1,20 @@
+language: csharp
+mono: none
+dotnet: 2.1.402
+
+install:
+ - dotnet restore
+
+script:
+ - |
+  if [ "${TRAVIS_BRANCH}" == "master" ]; then
+    dotnet pack -o $HOME /p:Version=$PACKAGE_VERSION
+  fi
+ - |
+  if [ "${TRAVIS_BRANCH}" == "development" ]; then
+    dotnet pack -o $HOME /p:Version=$PACKAGE_VERSION-beta-$TRAVIS_BUILD_NUMBER
+  fi
+ - dotnet nuget push $HOME/*.nupkg -k $NUGETKEY -s $NUGETURL
+ 
+env:
+ - PACKAGE_VERSION=1.1.0 

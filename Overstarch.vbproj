@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Overstarch</RootNamespace>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Authors>Luke Triano</Authors>
+    <Description>A .Net Core library for retrieving Overwatch player stats.</Description>
+    <PackageLicenseUrl>https://github.com/Giggitybyte/Overstarch/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Giggitybyte/Overstarch</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Giggitybyte/Overstarch</RepositoryUrl>
+    <PackageTags>overwatch api player stats</PackageTags>
+    <Version>1.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove=".gitignore" />
+    <None Remove=".travis.yml" />
+    <None Remove="LICENSE" />
+    <None Remove="README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="0.9.11" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  </ItemGroup>
+
+</Project>
