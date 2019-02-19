@@ -8,8 +8,8 @@
     <PackageLicenseUrl>https://github.com/Giggitybyte/Overstarch/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Giggitybyte/Overstarch</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Giggitybyte/Overstarch</RepositoryUrl>
-    <PackageTags>overwatch api player stats</PackageTags>
-    <Version>1.1.0</Version>
+    <PackageTags>overwatch api overwatch-api player stats</PackageTags>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
