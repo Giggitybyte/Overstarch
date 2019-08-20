@@ -14,41 +14,39 @@ Public NotInheritable Class OverwatchClient
     Private Shared ReadOnly _xblIdRegex As Regex = New Regex("[a-zA-Z0-9\s]{1,15}")
 
     ''' <summary>
-    ''' Fetches data and stats for an Overwatch player.
-    ''' <para>If a platform is not specified, a search across all platforms will be attempted; this will increase the time to retrieve data.</para>
+    ''' Fetches data and stats for an Overwatch player.<para/>
+    ''' If a platform is not specified, a search across all platforms will be attempted; this will increase the time to retrieve data.
     ''' </summary>
     ''' <param name="username">The username or battletag of the player to retrieve.</param>
     ''' <param name="platform">The platform for the provided username.</param>
     ''' <returns>An <see cref="OverwatchPlayer"/> object.</returns>
     Public Async Function GetPlayerAsync(username As String, Optional platform As OverwatchPlatform = 0) As Task(Of OverwatchPlayer)
-        Dim player As OverwatchPlayer
 
-        If platform = 0 Then
-            player = Await PlatformLookupAsync(username).ConfigureAwait(False)
+        Select Case platform
+            Case 0
+                Return Await PlatformLookupAsync(username).ConfigureAwait(False)
 
-        Else
-            If platform = OverwatchPlatform.PC AndAlso Not _battletagRegex.IsMatch(username) Then
-                Throw New ArgumentException("Provided battletag was not valid.")
-            ElseIf platform = OverwatchPlatform.PSN AndAlso Not _psnIdRegex.IsMatch(username) Then
-                Throw New ArgumentException("Provided PSN ID was not valid.")
-            ElseIf platform = OverwatchPlatform.XBL AndAlso Not _xblIdRegex.IsMatch(username) Then
-                Throw New ArgumentException("Provided gamertag was not valid.")
-            End If
+            Case OverwatchPlatform.PC
+                If Not _battletagRegex.IsMatch(username) Then Throw New ArgumentException("Provided battletag was not valid.")
 
-            player = Await _profileParser.ParseAsync(username, platform).ConfigureAwait(False)
-        End If
+            Case OverwatchPlatform.PSN
+                If Not _psnIdRegex.IsMatch(username) Then Throw New ArgumentException("Provided PSN ID was not valid.")
 
-        If player Is Nothing Then
+            Case OverwatchPlatform.XBL
+                If Not _xblIdRegex.IsMatch(username) Then Throw New ArgumentException("Provided gamertag was not valid.")
 
-        End If
+            Case Else
+                Throw New ArgumentException("Provided platform was not valid.")
+        End Select
 
-        Return player
+        Return Await _profileParser.ParseAsync(username, platform).ConfigureAwait(False)
+
     End Function
 
 
     ''' <summary>
-    ''' Internal method: performs a lookup of Overwatch players from a username.
-    ''' <para>Auto-detects battletags that are passed in and searches lookup results for an exact match and returns it. Non-battletag lookups will simply return the first player from the lookup results.</para>
+    ''' Internal method: performs a lookup of Overwatch players from a username.<para/>
+    ''' Auto-detects battletags that are passed in and searches lookup results for an exact match and returns it. Non-battletag lookups will simply return the first player from the lookup results.
     ''' </summary>
     ''' <param name="username">The username or battletag to lookup.</param>
     ''' <returns>An <see cref="OverwatchPlayer"/> object.</returns>
@@ -56,21 +54,18 @@ Public NotInheritable Class OverwatchClient
         Dim lookupUrl As String = $"{OverstarchUtilities.BaseUrl}/search/account-by-name/{Uri.EscapeUriString(username)}"
         Dim lookupResults As List(Of OverwatchApiPlayer) = JsonConvert.DeserializeObject(Of List(Of OverwatchApiPlayer))(Await OverstarchUtilities.FetchJsonAsync(lookupUrl).ConfigureAwait(False))
 
-        If lookupResults.Count = 0 Then
-            Throw New ArgumentException("There are no Overwatch players with that username.")
-        Else
-            If _battletagRegex.IsMatch(username) Then
-                Dim matchedPlayer As OverwatchApiPlayer = lookupResults.Where(Function(r) r.Username.ToLower = username.ToLower).FirstOrDefault
+        If lookupResults.Any Then Throw New ArgumentException("There are no Overwatch players with that username.")
 
-                If matchedPlayer IsNot Nothing Then
-                    Return Await GetPlayerAsync(matchedPlayer.Username, matchedPlayer.Platform).ConfigureAwait(False)
-                Else
-                    Throw New ArgumentException("Provided battletag does not exist.")
-                End If
-            Else
-                Dim result As OverwatchApiPlayer = lookupResults.First
-                Return Await GetPlayerAsync(result.Username, result.Platform).ConfigureAwait(False)
-            End If
+        If _battletagRegex.IsMatch(username) Then
+            Dim matchedPlayer As OverwatchApiPlayer = lookupResults.Where(Function(r) r.Username.ToLower = username.ToLower).FirstOrDefault
+            If matchedPlayer Is Nothing Then Throw New ArgumentException("Provided battletag does not exist.")
+
+            Return Await GetPlayerAsync(matchedPlayer.Username, matchedPlayer.Platform).ConfigureAwait(False)
+
+        Else
+            Dim result As OverwatchApiPlayer = lookupResults.First
+            Return Await GetPlayerAsync(result.Username, result.Platform).ConfigureAwait(False)
         End If
+
     End Function
 End Class

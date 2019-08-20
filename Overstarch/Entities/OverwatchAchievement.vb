@@ -38,15 +38,12 @@ Namespace Entities
         Public ReadOnly Property Name As String
 
 
-        Friend Sub New(category As OverwatchAchievementCategory, description As String,
-                       hasAchieved As Boolean, iconUrl As String, name As String)
-
+        Friend Sub New(category As OverwatchAchievementCategory, description As String, hasAchieved As Boolean, iconUrl As String, name As String)
             _Category = category
             _Description = description
             _HasAchieved = hasAchieved
             _IconUrl = iconUrl
             _Name = name
-
         End Sub
     End Class
 End Namespace

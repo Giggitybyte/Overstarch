@@ -9,19 +9,19 @@ Namespace Entities
     Public NotInheritable Class OverwatchApiPlayer
 
         ''' <summary>
-        ''' Internal field for JSON deserialization.
+        ''' Internal backing field for JSON deserialization.
         ''' </summary>
         <JsonProperty("id")>
         Friend _blizzardId As String
 
         ''' <summary>
-        ''' Internal field for JSON deserialization.
+        ''' Internal backing field for JSON deserialization.
         ''' </summary>
         <JsonProperty("platform")>
         Friend _platform As OverwatchPlatform
 
         ''' <summary>
-        ''' Internal field for JSON deserialization.
+        ''' Internal backing field for JSON deserialization.
         ''' </summary>
         <JsonProperty("name")>
         Friend _username As String

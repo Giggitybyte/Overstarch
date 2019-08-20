@@ -1,5 +1,4 @@
-﻿Imports System.Collections.ObjectModel
-Imports System.IO
+﻿Imports System.IO
 Imports System.Text.RegularExpressions
 Imports AngleSharp
 Imports AngleSharp.Dom
@@ -22,32 +21,28 @@ Namespace Internal
             Dim profileUrl As String = $"{OverstarchUtilities.BaseUrl}/career/{platform.ToString.ToLower}/{username.Replace("#"c, "-"c)}"
             Dim profileWebpage As IDocument = Await _webpageParser.OpenAsync(profileUrl).ConfigureAwait(False)
 
-            If profileWebpage.QuerySelector("h1.u-align-center")?.FirstChild.TextContent = "Profile Not Found" Then
-                Throw New ArgumentException("Provided username does not exist On this platform.")
+            If profileWebpage.QuerySelector("h1.u-align-center")?.FirstChild.TextContent = "Profile Not Found" Then Throw New ArgumentException("Provided username does not exist on this platform.")
 
-            Else
-                Dim achievements = ParseAchievements(profileWebpage.QuerySelector("section[id='achievements-section']"))
-                Dim blizzardId = _playerIdRegex.Match(profileWebpage.QuerySelectorAll("script").Last.TextContent).Value
-                Dim competitiveRankImageUrl = If(TryCast(profileWebpage.QuerySelector("div.competitive-rank img"), IHtmlImageElement)?.Source, String.Empty)
-                Dim endorsements = ParseEndorsements(profileWebpage.QuerySelector("div.endorsement-level"))
-                Dim isProfilePrivate = profileWebpage.QuerySelector(".masthead-permission-level-text")?.TextContent = "Private Profile"
-                Dim playerIconUrl = DirectCast(profileWebpage.QuerySelector(".player-portrait"), IHtmlImageElement)?.Source
-                Dim playerLevel = ParsePlayerLevel(profileWebpage.QuerySelector(".masthead-player-progression"))
-                Dim stats = ParseStats(profileWebpage)
+            Dim player As New OverwatchPlayer With {
+                ._achievements = ParseAchievements(profileWebpage.QuerySelector("section[id='achievements-section']")),
+                ._blizzardId = _playerIdRegex.Match(profileWebpage.QuerySelectorAll("script").Last.TextContent).Value,
+                ._endorsements = ParseEndorsements(profileWebpage.QuerySelector("div.endorsement-level")),
+                ._platform = platform,
+                ._profileUrl = profileUrl,
+                ._isPrivateProfile = profileWebpage.QuerySelector(".masthead-permission-level-text")?.TextContent = "Private Profile",
+                ._iconUrl = DirectCast(profileWebpage.QuerySelector(".player-portrait"), IHtmlImageElement)?.Source,
+                ._level = ParsePlayerLevel(profileWebpage.QuerySelector(".masthead-player-progression")),
+                ._stats = ParseStats(profileWebpage),
+                ._skillRatings = ParseSkillRatings(profileWebpage.QuerySelector(".show-for-lg")),
+                ._username = profileWebpage.QuerySelector(".header-masthead").TextContent
+            }
 
-                Dim competitiveSkillRating As UShort = 0
-                Dim endorsementLevel As UShort = 0
+            Dim endorsementLevel As UShort = 0
+            UShort.TryParse(profileWebpage.QuerySelector(".EndorsementIcon-tooltip .u-center")?.TextContent, endorsementLevel)
+            player._endorsementLevel = endorsementLevel
 
-                UShort.TryParse(profileWebpage.QuerySelector("div.competitive-rank div")?.TextContent, competitiveSkillRating)
-                UShort.TryParse(profileWebpage.QuerySelector("div.endorsement-level div.u-center")?.TextContent, endorsementLevel)
-                username = profileWebpage.QuerySelector(".header-masthead").TextContent
-
-                Return New OverwatchPlayer(achievements, blizzardId, competitiveRankImageUrl,
-                                           competitiveSkillRating, endorsementLevel, endorsements,
-                                           isProfilePrivate, platform, playerIconUrl,
-                                           playerLevel, profileUrl, stats, username)
-
-            End If
+            profileWebpage.Dispose()
+            Return player
         End Function
 
         Private Function ParsePlayerLevel(levelContent As IElement) As UShort
@@ -112,7 +107,6 @@ Namespace Internal
                     Dim categoryData As IElement = achievementContent.QuerySelector($"div[data-category-id='{categoryElement.GetAttribute("value")}']")
 
                     For Each achievementData As IHtmlDivElement In categoryData.QuerySelectorAll("div.achievement-card")
-
                         Dim category As OverwatchAchievementCategory
                         Dim description As String = categoryData.QuerySelector($"div[id='{achievementData.Dataset("tooltip")}']").QuerySelector("p[class='h6']").TextContent
                         Dim iconUrl As String = If(TryCast(achievementData.QuerySelector("img.media-card-fill"), IHtmlImageElement).Source, String.Empty)
@@ -126,6 +120,25 @@ Namespace Internal
             End If
 
             Return achievements
+        End Function
+
+        Private Function ParseSkillRatings(playerProgression As IElement) As IReadOnlyDictionary(Of OverwatchRole, UShort)
+            Dim roleProgressions = playerProgression.QuerySelectorAll(".competitive-rank .competitive-rank-role")
+            Dim rankList As New Dictionary(Of OverwatchRole, UShort)
+
+            If roleProgressions Is Nothing Then Return rankList
+
+            For Each roleProgression In roleProgressions
+                Dim roleSection = roleProgression.Children(1).QuerySelector(".competitive-rank-section .competitive-rank-tier")
+                Dim role = [Enum].Parse(Of OverwatchRole)(roleSection.GetAttribute("data-ow-tooltip-text").Split(" ").First)
+
+                Dim sr As UShort
+                UShort.TryParse(roleProgression.Children(1).TextContent, sr)
+
+                rankList.Add(role, sr)
+            Next
+
+            Return rankList
         End Function
 
         Private Function ParseStats(profile As IDocument) As IReadOnlyDictionary(Of OverwatchGamemode, IReadOnlyList(Of OverwatchStat))
@@ -178,7 +191,6 @@ Namespace Internal
             Else
                 Return name.Trim.RemoveDiacritics.RemoveNonAlphanumeric.RemoveWhitespace
             End If
-
         End Function
     End Class
 End Namespace
