@@ -2,12 +2,12 @@ language: csharp
 mono: none
 dotnet: 2.1.402
 
+before_install: 
+ - cd Overstarch
+
 install:
  - dotnet restore 
  
-before_script: 
- - cd Overstarch
-
 script:
  - |
   if [ "${TRAVIS_BRANCH}" == "master" ]; then
