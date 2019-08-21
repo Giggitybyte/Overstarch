@@ -17,7 +17,8 @@ Nevertheless, below are some snippets of code that will give you the general ide
 
         // Basic player information example.
         Console.WriteLine($"Level {owPlayer.PlayerLevel}");
-        Console.WriteLine($"Competitive SR: {owPlayer.CompetitiveSkillRating}");
+        Console.WriteLine($"Support SR: {owPlayer.SkillRatings.GetRole(OverwatchRole.Support)}");
+        Console.WriteLine($"Role With Highest SR: {owPlayer.SkillRatings.GetHighestRole.Key.ToString}");
         Console.WriteLine($"Private Profile: {owPlayer.IsProfilePrivate}");
 
         // Player stats example.
@@ -46,7 +47,8 @@ Nevertheless, below are some snippets of code that will give you the general ide
 
         ' Basic player information example.
         Console.WriteLine($"Level {owPlayer.PlayerLevel}")
-        Console.WriteLine($"Competitive SR: {owPlayer.CompetitiveSkillRating}")
+        Console.WriteLine($"Support SR: {owPlayer.SkillRatings.GetRole(OverwatchRole.Support)}")
+        Console.WriteLine($"Role With Highest SR: {owPlayer.SkillRatings.GetHighestRole.Key.ToString}")
         Console.WriteLine($"Private Profile: {owPlayer.IsProfilePrivate}")
 
         ' Player stats example.
@@ -73,4 +75,4 @@ See a problem with my code? Want to add in a new feature? Then please feel free 
 I am always open to suggestions and critique. 
 
 ## Questions and Help
-If you have any questions about the library or need help for some reason, go ahead and either open a pull request or [join my Discord server](https://placeholderlink.com/i-will-put-something-here-soon).
+If you have any questions about the library or need help for some reason, go ahead and either open a pull request or [join my Discord server](https://discord.gg/KZ5cypD).
