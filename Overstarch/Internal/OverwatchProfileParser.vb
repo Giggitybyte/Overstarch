@@ -104,7 +104,7 @@ Namespace Internal
 
                 For Each achievementData As IHtmlDivElement In categoryData.QuerySelectorAll("div.achievement-card")
                     Dim achievement As New OverwatchAchievement With {
-                        ._category = [Enum].Parse(Of OverwatchAchievementCategory)(categoryElement.GetAttribute("option-id").ToUpper),
+                        ._category = [Enum].Parse(Of OverwatchAchievementCategory)(categoryElement.GetAttribute("option-id"), True),
                         ._description = categoryData.QuerySelector($"div[id='{achievementData.Dataset("tooltip")}']").QuerySelector("p[class='h6']").TextContent,
                         ._hasAchieved = Not achievementData.GetAttribute("class").Contains("m-disabled"),
                         ._iconUrl = If(TryCast(achievementData.QuerySelector("img.media-card-fill"), IHtmlImageElement).Source, String.Empty),
