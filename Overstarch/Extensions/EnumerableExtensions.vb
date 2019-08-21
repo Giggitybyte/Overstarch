@@ -78,5 +78,15 @@ Namespace Extensions
             If skillRatings.ContainsKey(role) Then Return skillRatings(role)
             Return 0
         End Function
+
+        ''' <summary>
+        ''' Retrieves the role with the highest skill rating.
+        ''' </summary>
+        ''' <returns>A <see cref="KeyValuePair"/></returns>
+        <Extension>
+        Public Function GetHighestRole(skillRatings As IReadOnlyDictionary(Of OverwatchRole, UShort)) As KeyValuePair(Of OverwatchRole, UShort)
+            If Not skillRatings.Any Then Return Nothing
+            Return skillRatings.OrderByDescending(Function(s) s.Value).FirstOrDefault
+        End Function
     End Module
 End Namespace

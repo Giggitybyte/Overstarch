@@ -21,26 +21,20 @@ Public NotInheritable Class OverwatchClient
     ''' <param name="platform">The platform for the provided username.</param>
     ''' <returns>An <see cref="OverwatchPlayer"/> object.</returns>
     Public Async Function GetPlayerAsync(username As String, Optional platform As OverwatchPlatform = 0) As Task(Of OverwatchPlayer)
-
         Select Case platform
             Case 0
                 Return Await PlatformLookupAsync(username).ConfigureAwait(False)
-
             Case OverwatchPlatform.PC
                 If Not _battletagRegex.IsMatch(username) Then Throw New ArgumentException("Provided battletag was not valid.")
-
             Case OverwatchPlatform.PSN
                 If Not _psnIdRegex.IsMatch(username) Then Throw New ArgumentException("Provided PSN ID was not valid.")
-
             Case OverwatchPlatform.XBL
                 If Not _xblIdRegex.IsMatch(username) Then Throw New ArgumentException("Provided gamertag was not valid.")
-
             Case Else
                 Throw New ArgumentException("Provided platform was not valid.")
         End Select
 
         Return Await _profileParser.ParseAsync(username, platform).ConfigureAwait(False)
-
     End Function
 
 
@@ -59,13 +53,10 @@ Public NotInheritable Class OverwatchClient
         If _battletagRegex.IsMatch(username) Then
             Dim matchedPlayer As OverwatchApiPlayer = lookupResults.Where(Function(r) r.Username.ToLower = username.ToLower).FirstOrDefault
             If matchedPlayer Is Nothing Then Throw New ArgumentException("Provided battletag does not exist.")
-
             Return Await GetPlayerAsync(matchedPlayer.Username, matchedPlayer.Platform).ConfigureAwait(False)
-
         Else
             Dim result As OverwatchApiPlayer = lookupResults.First
             Return Await GetPlayerAsync(result.Username, result.Platform).ConfigureAwait(False)
         End If
-
     End Function
 End Class

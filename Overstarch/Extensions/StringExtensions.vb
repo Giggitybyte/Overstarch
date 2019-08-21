@@ -11,7 +11,6 @@ Namespace Extensions
         <Extension()>
         Friend Function RemoveDiacritics(text As String) As String
             If String.IsNullOrWhiteSpace(text) Then Return text
-
             text = text.Normalize(NormalizationForm.FormD)
             Return New String(text.Where(Function(c) CharUnicodeInfo.GetUnicodeCategory(c) <> UnicodeCategory.NonSpacingMark).ToArray()).Normalize(NormalizationForm.FormC)
         End Function
