@@ -145,7 +145,7 @@ Namespace Entities
         ''' <returns>A </returns>
         Public Async Function GetAliasesAsync() As Task
             Dim platformsUrl As String = $"{OverstarchUtilities.BaseUrl}/career/platforms/{BlizzardId}"
-            Dim json As String = Await OverstarchUtilities.FetchJsonAsync(platformsUrl).ConfigureAwait(False)
+            Dim json As String = Await OverstarchUtilities.FetchWebPageAsync(platformsUrl).ConfigureAwait(False)
             Dim accounts As List(Of OverwatchApiPlayer) = JsonConvert.DeserializeObject(Of List(Of OverwatchApiPlayer))(json)
 
             accounts.RemoveAll(Function(a) a.Platform = Platform)
