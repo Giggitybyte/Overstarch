@@ -2,9 +2,12 @@ language: csharp
 mono: none
 dotnet: 2.1.402
 
-install:
- - dotnet restore
+before_install: 
+ - cd Overstarch
 
+install:
+ - dotnet restore 
+ 
 script:
  - |
   if [ "${TRAVIS_BRANCH}" == "master" ]; then
@@ -16,5 +19,15 @@ script:
   fi
  - dotnet nuget push $HOME/*.nupkg -k $NUGETKEY -s $NUGETURL
  
+after_success:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh success $WEBHOOK_URL
+  
+after_failure:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh failure $WEBHOOK_URL
+ 
 env:
- - PACKAGE_VERSION=1.1.0 
+ - PACKAGE_VERSION=2.0.0 

@@ -9,24 +9,6 @@ Namespace Entities
     Public NotInheritable Class OverwatchApiPlayer
 
         ''' <summary>
-        ''' Internal field for JSON deserialization.
-        ''' </summary>
-        <JsonProperty("id")>
-        Friend _blizzardId As String
-
-        ''' <summary>
-        ''' Internal field for JSON deserialization.
-        ''' </summary>
-        <JsonProperty("platform")>
-        Friend _platform As OverwatchPlatform
-
-        ''' <summary>
-        ''' Internal field for JSON deserialization.
-        ''' </summary>
-        <JsonProperty("name")>
-        Friend _username As String
-
-        ''' <summary>
         ''' The Blizzard player ID for this player.
         ''' </summary>
         ''' <returns>A <see cref="String"/></returns>
@@ -55,6 +37,24 @@ Namespace Entities
                 Return _username
             End Get
         End Property
+
+        ''' <summary>
+        ''' Internal backing field for JSON deserialization.
+        ''' </summary>
+        <JsonProperty("id")>
+        Friend _blizzardId As String
+
+        ''' <summary>
+        ''' Internal backing field for JSON deserialization.
+        ''' </summary>
+        <JsonProperty("platform")>
+        Friend _platform As OverwatchPlatform
+
+        ''' <summary>
+        ''' Internal backing field for JSON deserialization.
+        ''' </summary>
+        <JsonProperty("name")>
+        Friend _username As String
 
     End Class
 End Namespace
