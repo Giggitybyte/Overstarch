@@ -75,4 +75,4 @@ See a problem with my code? Want to add in a new feature? Then please feel free 
 I am always open to suggestions and critique. 
 
 ## Questions and Help
-If you have any questions about the library or need help for some reason, go ahead and either open an issue or [join my Discord server](https://discord.gg/KZ5cypD).
+If you have any questions about the library or need help for some reason, go ahead and either open an issue or [join my Discord server](https://discord.gg/7jeR5Q5).
