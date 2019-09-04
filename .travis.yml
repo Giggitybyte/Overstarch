@@ -30,4 +30,4 @@ after_failure:
   - ./send.sh failure $WEBHOOK_URL
  
 env:
- - PACKAGE_VERSION=2.0.0 
+ - PACKAGE_VERSION=2.0.1 
