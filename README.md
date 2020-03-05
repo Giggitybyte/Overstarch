@@ -3,7 +3,7 @@
 
 This library is intended to be a replacement for the no longer maintained [Overwatch.Net](https://github.com/sirdoombox/Overwatch.Net).
 
-[![NuGet Latest Build](https://img.shields.io/nuget/vpre/Overstarch.svg?label=Latest&style=for-the-badge)](https://nuget.org/packages/Overstarch) [![NuGet Release Build](https://img.shields.io/nuget/v/Overstarch.svg?label=Release&style=for-the-badge)](https://nuget.org/packages/Overstarch) [![Build Status](https://img.shields.io/travis/Giggitybyte/Overstarch/development.svg?style=for-the-badge)](https://travis-ci.org/Giggitybyte/Overstarch)
+[![NuGet Latest Build](https://img.shields.io/nuget/vpre/Overstarch.svg?label=Latest%20Build&style=for-the-badge)](https://nuget.org/packages/Overstarch) [![NuGet Release Build](https://img.shields.io/nuget/v/Overstarch.svg?label=Latest%20Release&style=for-the-badge)](https://nuget.org/packages/Overstarch) [![Build Status](https://img.shields.io/travis/Giggitybyte/Overstarch/development.svg?style=for-the-badge)](https://travis-ci.org/Giggitybyte/Overstarch)
 
 ## Getting Started
 Each method in *Overstarch* has docstrings, so it should be fairly easy to understand what each method does and how to use them.
