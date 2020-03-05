@@ -1,7 +1,7 @@
 # Overstarch
 *Overstarch* is a .Net Core library written in Visual Basic that allows access to player information and stats for [Overwatch](https://en.wikipedia.org/wiki/Overwatch_(video_game)) by scraping user profiles and using hidden, non-public Blizzard APIs.
 
-This library is intended to be a replacement for the seemingly abandoned [Overwatch.Net](https://github.com/sirdoombox/Overwatch.Net).
+This library is intended to be a replacement for the no longer maintained [Overwatch.Net](https://github.com/sirdoombox/Overwatch.Net).
 
 [![NuGet Latest Build](https://img.shields.io/nuget/vpre/Overstarch.svg?label=Latest&style=for-the-badge)](https://nuget.org/packages/Overstarch) [![NuGet Release Build](https://img.shields.io/nuget/v/Overstarch.svg?label=Release&style=for-the-badge)](https://nuget.org/packages/Overstarch) [![Build Status](https://img.shields.io/travis/Giggitybyte/Overstarch/development.svg?style=for-the-badge)](https://travis-ci.org/Giggitybyte/Overstarch)
 
@@ -75,4 +75,4 @@ See a problem with my code? Want to add in a new feature? Then please feel free 
 I am always open to suggestions and critique. 
 
 ## Questions and Help
-If you have any questions about the library or need help for some reason, go ahead and either open an issue or [join my Discord server](https://discord.gg/VPaAuD9).
+If you have any questions about the library or need help for some reason, go ahead and either open an issue or [join my Discord server](https://discord.gg/yh2txuK).
