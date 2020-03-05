@@ -9,7 +9,7 @@
     <PackageProjectUrl>https://github.com/Giggitybyte/Overstarch</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Giggitybyte/Overstarch</RepositoryUrl>
     <PackageTags>overwatch api overwatch-api player stats c# csharp visual-basic visual basic .net dot-net</PackageTags>
-    <Version>2.0.1</Version>
+    <Version>2.1.0</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

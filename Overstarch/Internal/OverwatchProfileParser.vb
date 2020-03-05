@@ -33,7 +33,7 @@ Namespace Internal
                 ._iconUrl = DirectCast(profileWebpage.QuerySelector(".player-portrait"), IHtmlImageElement)?.Source,
                 ._level = ParsePlayerLevel(profileWebpage.QuerySelector(".masthead-player-progression")),
                 ._stats = ParseStats(profileWebpage),
-                ._skillRatings = ParseSkillRatings(profileWebpage.QuerySelector(".show-for-lg")),
+                ._skillRatings = ParseSkillRatings(profileWebpage.QuerySelector(".masthead-player-progression")),
                 ._username = profileWebpage.QuerySelector(".header-masthead").TextContent
             }
 
